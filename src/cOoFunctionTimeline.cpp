@@ -134,22 +134,22 @@ void cOo::FunctionTimeline::deactivateAll( void ) {
 
 void cOo::FunctionTimeline::getNextTouched( vector<Record> &touched, Time &time ) {
     
+    bool found;
     Record record;
-    bool found = false;
     vector<Record> tmp;
     
     // activation routines
     activateFrom( startHead, time );
     deactivateFrom( stopHead, time );
     
-    for( long k=0; k<touched.size(); k++ ) if( touched[k].state != atEnd ) tmp.push_back( touched[k] );
-    touched = tmp; // this trick is just my way to remove all 'atEnd' records from the touched vector
-    // probably using a list and remove() would work better, but let's keep it for later [TODO]
+    cleanEndTouched( touched );
     
     // then we force all the records to take the 'atEnd' state
     for( long k=0; k<touched.size(); k++ ) touched[k].state = atEnd;
     
     for( t=touchedList.begin(); t!=touchedList.end(); ++t ) {
+        
+        found = false;
         
         (*t)->getNextDataSet( time, record.data );
         record.type = (*t)->getType(); record.id = (*t)->getId();
@@ -162,6 +162,8 @@ void cOo::FunctionTimeline::getNextTouched( vector<Record> &touched, Time &time 
             if( touched[k].id == record.id ) {
                 
                 // we switch it back
+                touched[k].data = record.data;
+                touched[k].time = record.time;
                 touched[k].state = atAny;
                 found = true;
             }
@@ -178,9 +180,9 @@ void cOo::FunctionTimeline::getNextTouched( vector<Record> &touched, Time &time 
 
 void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
     
+    bool found;
     Record record;
-    bool found = false;
-    vector<Record> tmp;
+    //vector<Record> tmp;
     
     deactivateAll();
     touchedList.clear();
@@ -188,15 +190,15 @@ void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
     activateFrom( 0, time );
     deactivateFrom( 0, time );
     
-    for( long k=0; k<touched.size(); k++ ) if( touched[k].state != atEnd ) tmp.push_back( touched[k] );
-    touched = tmp; // this trick is just my way to remove all 'atEnd' records from the touched vector
-    // probably using a list and remove() would work better, but let's keep it for later [TODO]
+    cleanEndTouched( touched );
     
     // then we force all the records to take the 'atEnd' state
     for( long k=0; k<touched.size(); k++ ) touched[k].state = atEnd;
     
     for( t=touchedList.begin(); t!=touchedList.end(); ++t ) {
     
+        found = false;
+        
         (*t)->getDataSet( time, record.data );
         record.type = (*t)->getType(); record.id = (*t)->getId();
         record.time = time; // create record from touched list
@@ -207,7 +209,9 @@ void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
             // if the BPF is already there
             if( touched[k].id == record.id ) {
                 
-                // we switch it back
+                // update and switch back
+                touched[k].data = record.data;
+                touched[k].time = record.time;
                 touched[k].state = atAny;
                 found = true;
             }
@@ -220,6 +224,14 @@ void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
             touched.push_back( record );
         }
     }
+}
+
+void cOo::FunctionTimeline::cleanEndTouched( vector<Record> &touched ) {
+
+    vector<Record> tmp;
+    
+    for( long k=0; k<touched.size(); k++ ) if( touched[k].state != atEnd ) tmp.push_back( touched[k] );
+    touched.clear(); touched = tmp; // this trick is just my way to remove all 'atEnd' records
 }
 
 list<cOo::BreakPointFunction *>::iterator cOo::FunctionTimeline::getBegin( void ) {

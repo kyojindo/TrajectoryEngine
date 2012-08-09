@@ -27,6 +27,7 @@ namespace cOo {
         
         void getNextTouched( vector<Record> &touched, Time &time );
         void getTouched( vector<Record> &touched, Time &time );
+        void cleanEndTouched( vector<Record> &touched );
         
         list<BreakPointFunction *>::iterator getBegin( void );
         list<BreakPointFunction *>::iterator getEnd( void );

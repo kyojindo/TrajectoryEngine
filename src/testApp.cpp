@@ -5,7 +5,7 @@ void testApp::setup( void ) {
     ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
     ofEnableAlphaBlending(); ofEnableSmoothing();
     
-    timeline.load( 1, 64, 10.0f ); // [TODO] load( filename vuzikFile )
+    timeline.load( 8, 64, 20.0f ); // [TODO] load( filename vuzikFile )
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
@@ -103,10 +103,13 @@ void testApp::draw( void ) {
 
 void testApp::movePlaybackTime( Time time ) {
     
-    timer.moveOffset( time );
-    playbackTime = timer.getTime();
-    timeline.getTouched( touched, time );
-    sendTouchedAsOscMessages();
+    timer.moveOffset( time ); // we move timer at new time
+    
+    timeline.getTouched( touched, time ); // here we get the touched directly
+    sendTouchedAsOscMessages(); // then we send OSC messages to report that change
+    timeline.cleanEndTouched( touched ); // and we clean 'atEnd' ones right away
+    
+    playbackTime = timer.getTime(); // we change playback position
 }
 
 void testApp::zoomTimeline( double factor ) {
