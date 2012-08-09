@@ -3,6 +3,8 @@
 
 namespace cOo {
     
+    typedef double Time;
+    
     class DataSet {
     
       public:
@@ -13,10 +15,11 @@ namespace cOo {
         void set( double dataPitch, double dataVelocity );
         DataSet interpolate( DataSet &data, double factor );
         
-      protected:
+      //protected:
         
         double velocity; // velocity in [0.0f-1.0f]
         double pitch; // pitch as decimal MIDI
+        Time time; // time to display set
     };
 }
 

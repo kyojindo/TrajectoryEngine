@@ -23,6 +23,7 @@ cOo::DataSet cOo::DataSet::interpolate( DataSet &data, double factor ) {
     // we interpolate pitch & velocity ( factor=0 -> 100% of this one )
     result.velocity = factor * data.velocity + (1.0f-factor) * velocity;
     result.pitch = factor * data.pitch + (1.0f-factor) * pitch;
+    result.time = factor * data.time + (1.0f-factor) * time;
     
     return( result );
 }

@@ -5,7 +5,7 @@ void testApp::setup( void ) {
     ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
     ofEnableAlphaBlending(); ofEnableSmoothing();
     
-    timeline.load( 8, 64, 20.0f ); // [TODO] load( filename vuzikFile )
+    timeline.load( 32, 32, 20.0f ); // [TODO] load( filename vuzikFile )
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
@@ -47,9 +47,9 @@ void testApp::draw( void ) {
     int bpfColor;
     float xVal, yVal, rVal;
     Record current, previous;
+    float xTouch, yTouch, tVal;
     float xPrevious, yPrevious;
     float xCurrent, yCurrent;
-    float yTouch, tVal;
     
     if( drawBPFs ) {
         
@@ -65,13 +65,25 @@ void testApp::draw( void ) {
                 (*bpf)->getRecord( k, current );
                 
                 yPrevious = ofMap( previous.data.getPitch(), 0, 1, ofGetHeight(), 0 );
-                xPrevious = getXfromTime( previous.time, timeOffset, pixelPerSec );
+                xPrevious = getXfromTime( previous.data.time, timeOffset, pixelPerSec );
                 
                 yCurrent = ofMap( current.data.getPitch(), 0, 1, ofGetHeight(), 0 );
-                xCurrent = getXfromTime( current.time, timeOffset, pixelPerSec );
+                xCurrent = getXfromTime( current.data.time, timeOffset, pixelPerSec );
                 
                 ofSetColor( bpfColor, bpfColor, bpfColor, 200 );
                 ofLine( xPrevious, yPrevious, xCurrent, yCurrent );
+            }
+            
+            // circle on each point
+            for( long k=0; k<(*bpf)->getSize(); k++ ) {
+                
+                (*bpf)->getRecord( k, current );
+                
+                yCurrent = ofMap( current.data.getPitch(), 0, 1, ofGetHeight(), 0 );
+                xCurrent = getXfromTime( current.data.time, timeOffset, pixelPerSec );
+                
+                ofSetColor( bpfColor, bpfColor, bpfColor, 220 );
+                ofNoFill(); ofCircle( xCurrent, yCurrent, 3 );
             }
         }
     }
@@ -91,9 +103,10 @@ void testApp::draw( void ) {
     for( long k=0; k<touched.size(); k++ ) {
         
         yTouch = ofMap( touched[k].data.getPitch(), 0, 1, ofGetHeight(), 0 );
+        xTouch = getXfromTime( touched[k].data.time, timeOffset, pixelPerSec );
         
         ofNoFill(); ofSetColor( 250, 250, 250, 220 );
-        ofCircle( tVal, yTouch, 6 );
+        ofCircle( xTouch, yTouch, 6 );
     }
     
     ofSetColor( 200, 200, 200 ); // draw playback time

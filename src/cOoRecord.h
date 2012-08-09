@@ -13,7 +13,6 @@ using namespace std;
 
 namespace cOo {
     
-    typedef double Time;
     typedef short State;
     
     const State atAny = 0;

@@ -28,12 +28,33 @@ Time stop, long size, long bpfId, string bpfType ) {
     
     for( long k=0; k<record.size(); k++ ) {
         
-        pitch += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 100.0f;
-        velo += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 100.0f;
+        pitch += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 10.0f;
+        velo += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 10.0f;
         record[k].data.set( pitch, velo ); // filled with some CRAP to test
         
+        record[k].data.time = time;
         record[k].time = time;
+        
         time += step; // inc
+    }
+    
+    // This is actually filled backwards to work at this point. It just means that there are
+    // two sequences of time stamps. One is inside the DataSet and correspond to the one entered
+    // by the user ( containing the anticausal parts ): the other one is basically the sorted
+    // list of these time stamps so that it's back in a causal form. When the system reads
+    // and check collisions, it uses that one but when we display, we use the user one
+    
+    // permutate times
+    for( long k=0; k<256; k++ ) {
+        
+        long previousIdx = (long)( ( (double)rand() / (double)RAND_MAX ) * (double)record.size() );
+        long currentIdx = (long)( ( (double)rand() / (double)RAND_MAX ) * (double)record.size() );
+        
+        Time previousTime = record[previousIdx].data.time;
+        Time currentTime = record[currentIdx].data.time;
+        
+        record[previousIdx].data.time = currentTime;
+        record[currentIdx].data.time = previousTime;
     }
     
     // </CRAP>
