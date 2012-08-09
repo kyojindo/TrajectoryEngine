@@ -14,15 +14,16 @@ using namespace std;
 namespace cOo {
     
     typedef double Time;
+    typedef short State;
     
-    const short atBegin = 0;
-    const short atEnd = 1;
+    const State atAny = 0;
+    const State atBegin = 1;
+    const State atEnd = -1;
     
     struct Record {
         
+        State state;
         DataSet data;
-        
-        short loc;
         string type;
         Time time;
         long id;

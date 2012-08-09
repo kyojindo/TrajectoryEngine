@@ -5,7 +5,7 @@ void testApp::setup( void ) {
     ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
     ofEnableAlphaBlending(); ofEnableSmoothing();
     
-    timeline.load( 32*4, 64, 60.0f ); // [TODO] load( filename vuzikFile )
+    timeline.load( 1, 64, 10.0f ); // [TODO] load( filename vuzikFile )
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
@@ -218,8 +218,10 @@ void testApp::sendTouchedAsOscMessages( void ) {
         
         message.addIntArg( touched[k].id );
         message.addStringArg( touched[k].type );
+        
         message.addFloatArg( touched[k].data.getPitch() );
         message.addFloatArg( touched[k].data.getVelocity() );
+        message.addIntArg( touched[k].state );
         
         oscSender.sendMessage( message );
     }

@@ -135,36 +135,90 @@ void cOo::FunctionTimeline::deactivateAll( void ) {
 void cOo::FunctionTimeline::getNextTouched( vector<Record> &touched, Time &time ) {
     
     Record record;
+    bool found = false;
+    vector<Record> tmp;
     
-    touched.clear();
-    
+    // activation routines
     activateFrom( startHead, time );
     deactivateFrom( stopHead, time );
+    
+    for( long k=0; k<touched.size(); k++ ) if( touched[k].state != atEnd ) tmp.push_back( touched[k] );
+    touched = tmp; // this trick is just my way to remove all 'atEnd' records from the touched vector
+    // probably using a list and remove() would work better, but let's keep it for later [TODO]
+    
+    // then we force all the records to take the 'atEnd' state
+    for( long k=0; k<touched.size(); k++ ) touched[k].state = atEnd;
     
     for( t=touchedList.begin(); t!=touchedList.end(); ++t ) {
         
         (*t)->getNextDataSet( time, record.data );
         record.type = (*t)->getType(); record.id = (*t)->getId();
-        record.time = time; touched.push_back( record );
+        record.time = time; // create record from touched list
+        
+        // we check in the cleaned touch list
+        for( long k=0; k<touched.size(); k++ ) {
+            
+            // if the BPF is already there
+            if( touched[k].id == record.id ) {
+                
+                // we switch it back
+                touched[k].state = atAny;
+                found = true;
+            }
+        }
+        
+        // new BPF
+        if( !found ) {
+            
+            record.state = atBegin;
+            touched.push_back( record );
+        }
     }
 }
 
 void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
     
     Record record;
-    
-    touchedList.clear();
-    touched.clear();
+    bool found = false;
+    vector<Record> tmp;
     
     deactivateAll();
+    touchedList.clear();
+    
     activateFrom( 0, time );
     deactivateFrom( 0, time );
+    
+    for( long k=0; k<touched.size(); k++ ) if( touched[k].state != atEnd ) tmp.push_back( touched[k] );
+    touched = tmp; // this trick is just my way to remove all 'atEnd' records from the touched vector
+    // probably using a list and remove() would work better, but let's keep it for later [TODO]
+    
+    // then we force all the records to take the 'atEnd' state
+    for( long k=0; k<touched.size(); k++ ) touched[k].state = atEnd;
     
     for( t=touchedList.begin(); t!=touchedList.end(); ++t ) {
     
         (*t)->getDataSet( time, record.data );
         record.type = (*t)->getType(); record.id = (*t)->getId();
-        record.time = time; touched.push_back( record );
+        record.time = time; // create record from touched list
+        
+        // we check in the cleaned touch list
+        for( long k=0; k<touched.size(); k++ ) {
+            
+            // if the BPF is already there
+            if( touched[k].id == record.id ) {
+                
+                // we switch it back
+                touched[k].state = atAny;
+                found = true;
+            }
+        }
+        
+        // new BPF
+        if( !found ) {
+            
+            record.state = atBegin;
+            touched.push_back( record );
+        }
     }
 }
 
