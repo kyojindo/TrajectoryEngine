@@ -253,7 +253,7 @@ void testApp::sendTouchedAsOscMessages( void ) {
         message.setAddress( "/bpf" );
         
         message.addIntArg( tTouched[k].id );
-        message.addStringArg( tTouched[k].type );
+        message.addIntArg( tTouched[k].type );
         
         message.addFloatArg( tTouched[k].data.getPitch() );
         message.addFloatArg( tTouched[k].data.getVelocity() );

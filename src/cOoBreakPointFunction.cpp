@@ -3,11 +3,11 @@
 cOo::BreakPointFunction::BreakPointFunction( void ) {
     
     active = false;
-    id = 0; type = "";
+    id = 0; type = 0;
     head = 0;
 }
 
-void cOo::BreakPointFunction::setProperties( long bpfId, string bpfType  ) {
+void cOo::BreakPointFunction::setProperties( long bpfId, long bpfType  ) {
 
     id = bpfId; type = bpfType;
 }
@@ -132,7 +132,7 @@ cOo::Time cOo::BreakPointFunction::getStopTime( void ) {
     return( time );
 }
 
-string &cOo::BreakPointFunction::getType( void ) {
+long cOo::BreakPointFunction::getType( void ) {
 
     return( type );
 }
@@ -142,7 +142,7 @@ long cOo::BreakPointFunction::getSize( void ) {
     return( record.size() );
 }
 
-long &cOo::BreakPointFunction::getId( void ) {
+long cOo::BreakPointFunction::getId( void ) {
     
     return( id );
 }
@@ -166,6 +166,6 @@ bool cOo::BreakPointFunction::isActive( void ) {
 
 void cOo::BreakPointFunction::print( void ) {
     
-    cout << isActive() << " | type: " << type.c_str() << " | start: " << getStartTime() << " | stop: "
+    cout << isActive() << " | type: " << getType() << " | start: " << getStartTime() << " | stop: "
     << getStopTime() << " | size: " << getSize() << " | head: " << head << " | id: " << id << endl;
 }

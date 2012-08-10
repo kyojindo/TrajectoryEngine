@@ -36,7 +36,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         // which is probably the ordering in the XML file anyway
         
         // set the BPF properties
-        (*t)->setProperties( id, "tenor" );
+        (*t)->setProperties( id, 0 );
         
         // start from a random point in data space
         dataSet.pitch = 0.5f*( (double)rand() / (double)RAND_MAX )+0.25f;

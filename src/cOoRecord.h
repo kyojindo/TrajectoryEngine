@@ -21,10 +21,11 @@ namespace cOo {
     
     struct Record {
         
-        State state;
-        DataSet data;
-        string type;
         Time time;
+        DataSet data;
+                
+        State state;
+        long type;
         long id;
     };
 }
