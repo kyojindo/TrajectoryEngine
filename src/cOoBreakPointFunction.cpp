@@ -26,16 +26,15 @@ Time stop, long size, long bpfId, string bpfType ) {
     double pitch = (double)rand() / (double)RAND_MAX;
     double velo = (double)rand() / (double)RAND_MAX;
     
-    for( long k=0; k<record.size(); k++ ) {
+    for( re=record.begin(); re!=record.end(); re++ ) {
         
         pitch += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 10.0f;
         velo += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 10.0f;
-        record[k].data.set( pitch, velo ); // filled with some CRAP to test
+        (*re).data.set( pitch, velo ); // filled with some CRAP to test
         
-        record[k].data.time = time;
-        record[k].time = time;
-        
-        time += step; // inc
+        (*re).data.time = time;
+        (*re).time = time;
+        time += step;
     }
     
     // This is actually filled backwards to work at this point. It just means that there are
@@ -45,7 +44,7 @@ Time stop, long size, long bpfId, string bpfType ) {
     // and check collisions, it uses that one but when we display, we use the user one
     
     // permutate times
-    for( long k=0; k<256; k++ ) {
+    /*for( long k=0; k<256; k++ ) {
         
         long previousIdx = (long)( ( (double)rand() / (double)RAND_MAX ) * (double)record.size() );
         long currentIdx = (long)( ( (double)rand() / (double)RAND_MAX ) * (double)record.size() );
@@ -55,24 +54,41 @@ Time stop, long size, long bpfId, string bpfType ) {
         
         record[previousIdx].data.time = currentTime;
         record[currentIdx].data.time = previousTime;
-    }
+    }*/
     
     // </CRAP>
+}
+
+void cOo::BreakPointFunction::addDataSet( DataSet &dataSet ) {
+
+    // 1) we add the new data set at the end of the BPF
+    // 2) we save the time sequence stored in record[k].data.time
+    // 3) we sort the list by time regarding record[k].time
+    // 4) we reapply the saved time sequence on data.time
 }
 
 bool cOo::BreakPointFunction::startTimeSortPredicate(
 const BreakPointFunction *left,  const BreakPointFunction *right ) {
     
-    // compare start times betwenn two BPFs
-    return( left->record[0].time < right->record[0].time );
+    Time leftTime, rightTime;
+    list<Record>::const_iterator it;
+    
+    it = left->record.begin(); leftTime = (*it).time;
+    it = right->record.begin(); rightTime = (*it).time;
+    
+    return( leftTime < rightTime );
 }
 
 bool cOo::BreakPointFunction::stopTimeSortPredicate(
 const BreakPointFunction *left, const BreakPointFunction *right ) {
     
-    // compare stop times betwenn two BPFs
-    return( left->record[left->record.size()-1].time
-    < right->record[right->record.size()-1].time );
+    Time leftTime, rightTime;
+    list<Record>::const_iterator it;
+    
+    for( it=left->record.begin(); it!=left->record.end(); it++ ) { leftTime = (*it).time; }
+    for( it=right->record.begin(); it!=right->record.end(); it++ ) { rightTime = (*it).time; }
+    
+    return( leftTime < rightTime );
 }
 
 long cOo::BreakPointFunction::getNextDataSetFrom(
@@ -81,18 +97,25 @@ long fromIndex, Time &time, DataSet &fromQuery ) {
     double factor; // interpolation factor
     long foundIndex = IndexNotFound; // init
     
-    if( fromIndex > record.size()-1 ) return foundIndex; // check input values
-    if( time < record[fromIndex].time || time > getStopTime() ) return foundIndex;
+    // initialize iterators
+    re = record.begin(); re++;
+    ne = re; re = record.begin();
+    
+    // then move then until they reach fromIndex
+    for( long k=0; k<fromIndex; k++ ) { re++; ne++; }
+    
+    if( fromIndex > record.size()-1 ) return foundIndex; // check input
+    if( time < (*re).time || time > getStopTime() ) return foundIndex;
     
     // search from the given index to 1 before last
-    for( long k=fromIndex; k<record.size()-1; k++ ) {
+    for( long k=fromIndex; k<record.size()-1; k++, re++, ne++ ) {
     
-        // if next time one is over it
-        if( record[k+1].time >= time ) {
+        // if next time one is >=
+        if( (*ne).time >= time ) {
         
-            factor = ( time-record[k].time ) / ( record[k+1].time-record[k].time );
-            fromQuery = record[k].data.interpolate( record[k+1].data, factor );
-            foundIndex = k; break; // we interpolate the surrounding data
+            factor = ( time - (*re).time ) / ( (*ne).time - (*re).time );
+            fromQuery = (*re).data.interpolate( (*ne).data, factor );
+            foundIndex = k; break; // we interpolate the data sets
         }
     }
     
@@ -113,19 +136,29 @@ bool cOo::BreakPointFunction::getDataSet( Time &time, DataSet &fromQuery ) {
     else return( false );
 }
 
-void cOo::BreakPointFunction::getRecord( long index, Record &query ) {
+void cOo::BreakPointFunction::getRecord( long index, Record &fromQuery ) {
 
-    query = record[index];
+    re = record.begin(); // move iter
+    for( long k=0; k<index; k++ ) re++;
+    fromQuery = (*re); // copy record
 }
 
-cOo::Time &cOo::BreakPointFunction::getStartTime( void ) {
+cOo::Time cOo::BreakPointFunction::getStartTime( void ) {
 
-    return( record[0].time );
+    Time time; list<Record>::iterator it;
+    
+    it = record.begin(); time = (*it).time;
+    
+    return( time );
 }
 
-cOo::Time &cOo::BreakPointFunction::getStopTime( void ) {
+cOo::Time cOo::BreakPointFunction::getStopTime( void ) {
 
-    return( record[record.size()-1].time );
+    Time time; list<Record>::iterator it;
+    
+    for( it=record.begin(); it!=record.end(); it++ ) { time = (*it).time; }
+    
+    return( time );
 }
 
 string &cOo::BreakPointFunction::getType( void ) {

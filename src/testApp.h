@@ -4,9 +4,10 @@
 #include <vector>
 #include <deque>
 
-#include "ofMain.h"
 #include "cOoFunctionTimeline.h"
 #include "cOoAudioTimer.h"
+
+#include "ofMain.h"
 #include "ofxOsc.h"
 
 using namespace cOo;
@@ -57,20 +58,30 @@ class testApp : public ofBaseApp {
     // - timeline of breakpoint functions ---
     FunctionTimeline timeline; // BPF timeline
     list<BreakPointFunction *>::iterator bpf;
-    vector<Record> touched; // touched sets
+    
+    // <protected-memory>
+    
+    // - duplicated touched ( for memory barriers tricks )
+    vector<Record> tTouched, uTouched, dTouched, sTouched;
+    
+    // duplicated playback times ( for memory barriers tricks )
+    Time tPlaybackTime, uPlaybackTime, dPlaybackTime, sPlaybackTime;
+    
+    // </protected-memory>
     
     // - OSC interface --
     ofxOscSender oscSender;
     ofxOscReceiver oscReceiver;
     ofxOscMessage message;
     
-    // - playback ---
-    Time playbackTime;
+    // - playback --
     AudioTimer timer;
     bool playAsLoop;
     
     // - display --
     double timeOffset;
     double pixelPerSec;
+    double zoomFactor;
+    bool isSliding;
     bool drawBPFs;
 };

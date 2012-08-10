@@ -4,7 +4,7 @@
 #include <cassert>
 #include <iostream>
 #include <cstring>
-#include <vector>
+#include <list>
 
 #include "cOoRecord.h"
 
@@ -23,6 +23,9 @@ namespace cOo {
         // load function: put stuff in the BPF, it's full of crap right now
         void load( Time start, Time stop, long size, long bpfId, string bpfType );
         
+        // incremental add of new data set
+        void addDataSet( DataSet &dataSet );
+        
         // static functions defined to help any BPF to be sorted both by ascending start and stop times
         static bool startTimeSortPredicate( const BreakPointFunction *left, const BreakPointFunction *right );
         static bool stopTimeSortPredicate( const BreakPointFunction *left, const BreakPointFunction *right );
@@ -35,10 +38,10 @@ namespace cOo {
         bool getDataSet( Time &time, DataSet &fromQuery ); // overall search
         
         // this one is just to display the records
-        void getRecord( long index, Record &query );
+        void getRecord( long index, Record &fromQuery );
         
-        Time &getStartTime( void );
-        Time &getStopTime( void );
+        Time getStartTime( void );
+        Time getStopTime( void );
         
         void activate( void );
         void deactivate( void );
@@ -52,7 +55,10 @@ namespace cOo {
         
       protected:
         
-        vector<Record> record;
+        list<Record> record;
+        list<Record>::iterator re;
+        list<Record>::iterator ne;
+        
         bool active; long head;
         string type; long id;
     };
