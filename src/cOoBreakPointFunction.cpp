@@ -7,64 +7,32 @@ cOo::BreakPointFunction::BreakPointFunction( void ) {
     head = 0;
 }
 
-// [TODO] This function now fills with crap. If the Vuzik
-// XML file can be parsed properly, at some point, we should
-// have something like load( double *data, ..., long size, ... )
-// to replace it, importing raw data from outside as BPFs 
+void cOo::BreakPointFunction::setProperties( long bpfId, string bpfType  ) {
 
-void cOo::BreakPointFunction::load( Time start,
-Time stop, long size, long bpfId, string bpfType ) {
-    
-    record.resize( size ); // set the BPF size
-    id = bpfId; type = bpfType; // and properties
-    
-    // <CRAP>
-    
-    Time time = start; // set the time axis
-    Time step = ( stop-start ) / (Time)size;
-    
-    double pitch = (double)rand() / (double)RAND_MAX;
-    double velo = (double)rand() / (double)RAND_MAX;
-    
-    for( re=record.begin(); re!=record.end(); re++ ) {
-        
-        pitch += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 10.0f;
-        velo += ( 2.0f*( (double)rand() / (double)RAND_MAX ) - 1.0f ) / 10.0f;
-        (*re).data.set( pitch, velo ); // filled with some CRAP to test
-        
-        (*re).data.time = time;
-        (*re).time = time;
-        time += step;
-    }
-    
-    // This is actually filled backwards to work at this point. It just means that there are
-    // two sequences of time stamps. One is inside the DataSet and correspond to the one entered
-    // by the user ( containing the anticausal parts ): the other one is basically the sorted
-    // list of these time stamps so that it's back in a causal form. When the system reads
-    // and check collisions, it uses that one but when we display, we use the user one
-    
-    // permutate times
-    /*for( long k=0; k<256; k++ ) {
-        
-        long previousIdx = (long)( ( (double)rand() / (double)RAND_MAX ) * (double)record.size() );
-        long currentIdx = (long)( ( (double)rand() / (double)RAND_MAX ) * (double)record.size() );
-        
-        Time previousTime = record[previousIdx].data.time;
-        Time currentTime = record[currentIdx].data.time;
-        
-        record[previousIdx].data.time = currentTime;
-        record[currentIdx].data.time = previousTime;
-    }*/
-    
-    // </CRAP>
+    id = bpfId; type = bpfType;
 }
 
 void cOo::BreakPointFunction::addDataSet( DataSet &dataSet ) {
-
-    // 1) we add the new data set at the end of the BPF
-    // 2) we save the time sequence stored in record[k].data.time
-    // 3) we sort the list by time regarding record[k].time
-    // 4) we reapply the saved time sequence on data.time
+    
+    Record newRec;
+    RecordIter re;
+    
+    list<Time> time;
+    list<Time>::iterator t;
+    
+    newRec.data = dataSet;
+    
+    record.push_back( newRec );
+    time.resize( record.size() );
+    
+    for( re=record.begin(), t=time.begin(); re!=record.end();
+    re++, t++ ) (*t) = (*re).data.time; // save data times
+    
+    time.sort(); // - the sequence of times is sorted ---
+    
+    for( re=record.begin(), t=time.begin(); re!=record.end();
+    re++, t++ ) (*re).time = (*t); // linear remap BPF time
+    
 }
 
 bool cOo::BreakPointFunction::startTimeSortPredicate(
@@ -96,6 +64,7 @@ long fromIndex, Time &time, DataSet &fromQuery ) {
     
     double factor; // interpolation factor
     long foundIndex = IndexNotFound; // init
+    RecordIter re, ne; // iterators
     
     // initialize iterators
     re = record.begin(); re++;
@@ -138,6 +107,8 @@ bool cOo::BreakPointFunction::getDataSet( Time &time, DataSet &fromQuery ) {
 
 void cOo::BreakPointFunction::getRecord( long index, Record &fromQuery ) {
 
+    RecordIter re;
+    
     re = record.begin(); // move iter
     for( long k=0; k<index; k++ ) re++;
     fromQuery = (*re); // copy record
@@ -145,7 +116,7 @@ void cOo::BreakPointFunction::getRecord( long index, Record &fromQuery ) {
 
 cOo::Time cOo::BreakPointFunction::getStartTime( void ) {
 
-    Time time; list<Record>::iterator it;
+    Time time; RecordIter it;
     
     it = record.begin(); time = (*it).time;
     
@@ -154,7 +125,7 @@ cOo::Time cOo::BreakPointFunction::getStartTime( void ) {
 
 cOo::Time cOo::BreakPointFunction::getStopTime( void ) {
 
-    Time time; list<Record>::iterator it;
+    Time time; RecordIter it;
     
     for( it=record.begin(); it!=record.end(); it++ ) { time = (*it).time; }
     

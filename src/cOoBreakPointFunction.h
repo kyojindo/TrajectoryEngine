@@ -4,6 +4,7 @@
 #include <cassert>
 #include <iostream>
 #include <cstring>
+#include <vector>
 #include <list>
 
 #include "cOoRecord.h"
@@ -11,6 +12,8 @@
 using namespace std;
 
 namespace cOo {
+    
+    typedef list<Record>::iterator RecordIter;
     
     const long IndexNotFound = -1;
     
@@ -20,10 +23,8 @@ namespace cOo {
         
         BreakPointFunction( void );
         
-        // load function: put stuff in the BPF, it's full of crap right now
-        void load( Time start, Time stop, long size, long bpfId, string bpfType );
-        
-        // incremental add of new data set
+        // to fill the BPF with data sets and properties
+        void setProperties( long bpfId, string bpfType  );
         void addDataSet( DataSet &dataSet );
         
         // static functions defined to help any BPF to be sorted both by ascending start and stop times
@@ -55,10 +56,7 @@ namespace cOo {
         
       protected:
         
-        list<Record> record;
-        list<Record>::iterator re;
-        list<Record>::iterator ne;
-        
+        list<Record> record;        
         bool active; long head;
         string type; long id;
     };

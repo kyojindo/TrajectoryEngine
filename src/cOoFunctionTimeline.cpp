@@ -13,49 +13,50 @@ cOo::FunctionTimeline::~FunctionTimeline( void ) {
     }
 }
 
-// [TODO] This function now fills with crap. If the Vuzik XML file
-// can be properly parsed, it should be inputed here and interatively
-// the various BPFs it contains + properties should be filled in the
-// list. Space is created here and start/stop lists are sorted here
-// too. As long as start/stop times are provided, it should work
-
-// /!\ I thought that we could use a relative time inside [0.-1.]
-// in the time stamps, and keep the absolute time in ms + speed
-// ratio in the timeline object for being used at runtime
-
 void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
     
-    long k = 1;
-    double time1, time2;
-    double startTime, stopTime;
+    long id = 1;
+    double startTime;
+    DataSet dataSet;
     
     startList.resize( tlSize );
     stopList.resize( tlSize );
     scoreMaxTime = maxTime;
     
-    for( t=startList.begin(); t!=startList.end(); ++t, k++ ) {
+    for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
+        
+        (*t) = new BreakPointFunction();
         
         // <CRAP>
         
-        time1 = time2 = 0.0f;
+        // Here we fill the BPF using the addSetSet() ( = good ) but the sets
+        // are made out of incremental random data and times. At this point, the
+        // Vuzik XML file should be parsed, a arbitrary time base defined, and
+        // the data sets added as to respect the ordering of the painting
+        // which is probably the ordering in the XML file anyway
         
-        while( fabs(time1-time2) < (0.2*scoreMaxTime) ) {
+        // set the BPF properties
+        (*t)->setProperties( id, "tenor" );
+        
+        // start from a random point in data space
+        dataSet.pitch = 0.5f*( (double)rand() / (double)RAND_MAX )+0.25f;
+        dataSet.velocity = (double)rand() / (double)RAND_MAX;
+        
+        // and start from a random time in virtual time
+        dataSet.time = ( (double)rand() / (double)RAND_MAX ) * scoreMaxTime;
+        
+        for( long k=0; k<bpfSize; k++ ) {
+        
+            (*t)->addDataSet( dataSet );
             
-            // we generate random start/stop times
-            time1 = ( (double)rand() / (double)RAND_MAX ) * scoreMaxTime;
-            time2 = ( (double)rand() / (double)RAND_MAX ) * scoreMaxTime;
+            dataSet.pitch += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
+            dataSet.velocity += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
             
-            // but we make sure starts are always smaller than stops
-            if( time1 < time2 ) { startTime = time1; stopTime = time2; }
-            if( time2 < time1 ) { startTime = time2; stopTime = time1; }
+            dataSet.time += 0.4f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
+            if( dataSet.time < 0.0f ) dataSet.time = 0.0f;
         }
         
-        // </CRAP>
-        
-        (*t) = new BreakPointFunction(); // allocate the memory for that BPF
-        (*t)->load( startTime, stopTime, bpfSize, k, "tenor" ); // load with stuff
-        
-        // -> here we should get real data from the XML file to go in (*t)
+        // <CRAP>
     }
     
     // sort startList by startTime order ( using overladed predicate )
