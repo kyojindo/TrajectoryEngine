@@ -42,8 +42,8 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         dataSet.pitch = 0.5f*( (double)rand() / (double)RAND_MAX )+0.25f;
         dataSet.velocity = (double)rand() / (double)RAND_MAX;
         
-        // and start from a random time in virtual time
-        dataSet.time = ( (double)rand() / (double)RAND_MAX ) * scoreMaxTime;
+        // and start from a random time in virtual time ( earliest = 0.5 from start )
+        dataSet.time = ( (double)rand() / (double)RAND_MAX ) * ( scoreMaxTime-1.0f ) + 0.5f;
         
         for( long k=0; k<bpfSize; k++ ) {
         
@@ -53,7 +53,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
             dataSet.velocity += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
             
             dataSet.time += 0.4f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
-            if( dataSet.time < 0.0f ) dataSet.time = 0.0f;
+            if( dataSet.time < 0.5f ) dataSet.time = 0.5f;
         }
         
         // <CRAP>
@@ -64,6 +64,8 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
     
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
+    
+    scoreMaxTime += 2.0f; // trick to add some room at the end
 }
 
 void cOo::FunctionTimeline::activateFrom( long fromIndex, Time &time ) {

@@ -5,24 +5,21 @@ void testApp::setup( void ) {
     ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
     ofEnableAlphaBlending(); ofEnableSmoothing();
     
-    timeline.load( 8, 32, 20.0f ); // [TODO] load( filename vuzikFile )
+    timeline.load( 8*10, 32, 20.0f ); // [TODO] load( filename vuzikFile )
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000
     
-    zoomTimeline( 1.0f );
-    timeOffset = 0.0;
+    zoomTimeline( 1.0f ); timeOffset = 0.0;
     
-    playAsLoop = false;
-    zoomFactor = 1.0f;
-    isSliding = false;
-    drawBPFs = true;
+    zoomFactor = 1.0f; playAsLoop = true;
+    isSliding = false; drawBPFs = true;
 }
 
 void testApp::exit( void ) {
     
-    if( timer.isRunning() ) timer.stop();
+    if( isPlaying() ) pausePlayback();
 }
 
 void testApp::update( void ) {
@@ -37,10 +34,10 @@ void testApp::update( void ) {
         if( m.getAddress() == "/stop" ) stopPlayback();
         if( m.getAddress() == "/pause" ) pausePlayback();
         
-        if( m.getAddress() == "/move" ) movePlaybackTime( (Time)m.getArgAsFloat( 0 ) );
-        
         if( m.getAddress() == "/zoom" ) zoomTimeline( (double)m.getArgAsFloat( 0 ) );
         if( m.getAddress() == "/shift" ) moveTimeline( (Time)m.getArgAsFloat( 0 ) );
+        
+        if( m.getAddress() == "/move" ) movePlaybackTime( (Time)m.getArgAsFloat( 0 ) );
     }
 }
 
@@ -58,8 +55,8 @@ void testApp::draw( void ) {
     
     float tVal;
     
-    OSMemoryBarrier(); dTouched = sTouched;
-    OSMemoryBarrier(); dPlaybackTime = sPlaybackTime;
+    OSMemoryBarrier();
+    dTouched = sTouched;
     
     if( drawBPFs ) {
         
@@ -84,7 +81,7 @@ void testApp::draw( void ) {
                 ofLine( xPrevious, yPrevious, xCurrent, yCurrent );
             }
             
-            // circle on each point
+            // circle on each point of the BPF
             for( long k=0; k<(*bpf)->getSize(); k++ ) {
                 
                 (*bpf)->getRecord( k, current );
@@ -98,16 +95,24 @@ void testApp::draw( void ) {
         }
     }
     
-    // get playback head location
-    tVal = getXfromTime( dPlaybackTime, timeOffset, pixelPerSec ); isSliding = false;
+    playbackAccess.lock();
     
-    if( tVal > ofGetWidth()/2 && timeline.getMaxTime() > getTimefromX( ofGetWidth(), timeOffset, pixelPerSec ) ) {
+    // get the playback head position on the screen
+    tVal = getXfromTime( playbackTime, timeOffset, pixelPerSec );
+    isSliding = false; // tricky flag to cheat on position
     
-        // and shift the time offset to stay centered @ playback
-        timeOffset -= dPlaybackTime-getTimefromX( ofGetWidth()/2, timeOffset, pixelPerSec ); isSliding = true;
+    if( tVal > ofGetWidth()/2 && timeline.getMaxTime() >
+    getTimefromX( ofGetWidth(), timeOffset, pixelPerSec ) ) {
+    
+        // shift the time offset to stay centered @ playback
+        timeOffset -= playbackTime-getTimefromX( ofGetWidth()/2,
+        timeOffset, pixelPerSec ); isSliding = true;
     }
     
-    ofSetColor( 200, 200, 200 ); ofLine( tVal, 0, tVal, ofGetHeight() );
+    playbackAccess.unlock();
+    
+    ofSetColor( 200, 200, 200 ); // line
+    ofLine( tVal, 0, tVal, ofGetHeight() );
     
     // draw circles for touched sets
     for( long k=0; k<dTouched.size(); k++ ) {
@@ -122,27 +127,30 @@ void testApp::draw( void ) {
     }
     
     ofSetColor( 200, 200, 200 ); // draw playback time
-    ofDrawBitmapString( ofToString( dPlaybackTime ), 25, 30 );
+    
+    playbackAccess.lock();
+    ofDrawBitmapString( ofToString( playbackTime ), 25, 30 );
+    playbackAccess.unlock();
+    
     ofDrawBitmapString( ofToString( dTouched.size() ), 25, 60 );
 }
 
 void testApp::movePlaybackTime( Time time ) {
     
     OSMemoryBarrier(); uTouched = tTouched;
-    OSMemoryBarrier(); uPlaybackTime = tPlaybackTime;
     
     timer.moveOffset( time ); // we move timer at new time
-    uPlaybackTime = timer.getTime(); // we change playback position
+    
+    playbackAccess.lock();
+    playbackTime = timer.getTime(); // we change playback position
+    playbackAccess.unlock();
     
     timeline.getTouched( uTouched, time ); // here we get the touched directly
     sendTouchedAsOscMessages(); // then we send OSC messages to report that change
     timeline.cleanEndTouched( uTouched ); // and we clean 'atEnd' ones right away
     
-    OSMemoryBarrier(); tTouched = uTouched;
-    OSMemoryBarrier(); tPlaybackTime = uPlaybackTime;
-    
+    OSMemoryBarrier(); tTouched = uTouched;    
     OSMemoryBarrier(); sTouched = tTouched;
-    OSMemoryBarrier(); sPlaybackTime = tPlaybackTime;
 }
 
 void testApp::zoomTimeline( double factor ) {
@@ -151,7 +159,7 @@ void testApp::zoomTimeline( double factor ) {
     if( factor < 0.000001f ) factor = 0.000001f;
     
     // save the pixel position of the playback time in current window
-    float pOffset = getXfromTime( dPlaybackTime, timeOffset, pixelPerSec );
+    float pOffset = getXfromTime( playbackTime, timeOffset, pixelPerSec );
     
     // update boundaries from the new zooming factor
     pixelPerSec = factor * ( ofGetWidth() / 10.0f );
@@ -160,7 +168,7 @@ void testApp::zoomTimeline( double factor ) {
     double newPbt = getTimefromX( pOffset, timeOffset, pixelPerSec );
     
     // shift offset to preserve position
-    timeOffset += ( newPbt-dPlaybackTime );
+    timeOffset += ( newPbt-playbackTime );
 }
 
 void testApp::moveTimeline( Time shift ) {
@@ -277,17 +285,24 @@ void testApp::playbackTimeInc( void *usrPtr ) {
     
     testApp *app = (testApp *)usrPtr;
     
-    app->tPlaybackTime = app->timer.getTime();
-    app->timeline.getNextTouched( app->tTouched, app->tPlaybackTime );
-    app->sendTouchedAsOscMessages();
+    app->playbackAccess.lock();
     
-    if( app->tPlaybackTime > app->timeline.getMaxTime() ) {
+    if( app->playbackTime > app->timeline.getMaxTime() ) {
         
+        app->playbackAccess.unlock();
         if( !app->playAsLoop ) app->timer.stop();
         app->movePlaybackTime( 0.0f );
         app->timeOffset = 0.0f;
-    }
+        
+    } else {
     
-    OSMemoryBarrier(); app->sTouched = app->tTouched;
-    OSMemoryBarrier(); app->sPlaybackTime = app->tPlaybackTime;
+        app->playbackTime = app->timer.getTime();
+        app->timeline.getNextTouched( app->tTouched, app->playbackTime );
+        app->playbackAccess.unlock();
+        
+        OSMemoryBarrier();
+        app->sTouched = app->tTouched;
+        
+        app->sendTouchedAsOscMessages();
+    }
 }

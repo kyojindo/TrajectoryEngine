@@ -59,23 +59,18 @@ class testApp : public ofBaseApp {
     FunctionTimeline timeline; // BPF timeline
     list<BreakPointFunction *>::iterator bpf;
     
-    // <protected-memory>
-    
     // - duplicated touched ( for memory barriers tricks )
     vector<Record> tTouched, uTouched, dTouched, sTouched;
-    
-    // duplicated playback times ( for memory barriers tricks )
-    Time tPlaybackTime, uPlaybackTime, dPlaybackTime, sPlaybackTime;
-    
-    // </protected-memory>
     
     // - OSC interface --
     ofxOscSender oscSender;
     ofxOscReceiver oscReceiver;
     ofxOscMessage message;
     
-    // - playback --
+    // - playback -
     AudioTimer timer;
+    ofMutex playbackAccess;
+    Time playbackTime;
     bool playAsLoop;
     
     // - display --
