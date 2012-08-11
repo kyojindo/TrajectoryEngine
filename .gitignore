@@ -16,7 +16,8 @@ build/*
 
 # Exclude the bin directory
 bin/*
- 
+!bin/data
+
 # Exclude temp nibs and swap files
 *~.nib
 *.swp

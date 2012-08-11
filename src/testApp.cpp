@@ -22,6 +22,19 @@ void testApp::setup( void ) {
 	}else{
 		printf("unable to load data.xml check data/ folder");
 	}
+    bool push = xmlFile.pushTag("Graphics");
+    if (push) printf("OK\n");
+    push = xmlFile.pushTag("Graphics");
+    if (push) printf("OK\n");
+    int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
+    printf("num lines read in data = %i\n", numLines);
+    push = xmlFile.pushTag("PropertiesGraphicsPolyLine");
+    if (push) printf("OK\n");
+    push = xmlFile.pushTag("Points");
+    if (push) printf("OK\n");
+    
+    int numPts = xmlFile.getNumTags("Point");
+    printf("num points read in line = %i\n", numPts);
     
 }
 
