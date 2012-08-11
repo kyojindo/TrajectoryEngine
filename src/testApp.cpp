@@ -15,6 +15,14 @@ void testApp::setup( void ) {
     
     zoomFactor = 1.0f; playAsLoop = true;
     isSliding = false; drawBPFs = true;
+    
+    //test load data
+    if (xmlFile.loadFile("data.xml")){
+		printf("data.xml loaded!\n");
+	}else{
+		printf("unable to load data.xml check data/ folder");
+	}
+    
 }
 
 void testApp::exit( void ) {
