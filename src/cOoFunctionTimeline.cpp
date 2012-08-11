@@ -28,19 +28,50 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
 		printf("unable to load data.xml check data/ folder");
 	}
     bool push = xmlFile.pushTag("Graphics");
-    if (push) printf("OK\n");
+    if (push) printf("Graphics OK\n");
     push = xmlFile.pushTag("Graphics");
     if (push) printf("OK\n");
     int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
-    printf("num lines read in data = %i\n", numLines);
-    push = xmlFile.pushTag("PropertiesGraphicsPolyLine");
-    if (push) printf("OK\n");
-    push = xmlFile.pushTag("Points");
-    if (push) printf("OK\n");
+    printf("num polyLines read in data = %i\n", numLines);
     
-    int numPts = xmlFile.getNumTags("Point");
-    printf("num points read in line = %i\n", numPts);
-    
+    if (numLines > 0) {
+        double x_min = DBL_MAX;
+        double x_max = DBL_MIN;
+        double y_min = DBL_MAX;
+        double y_max = DBL_MIN;
+        
+        for (int l=0; l<numLines; l++) {
+//            if (push) printf("loading polyLine %i...  ", l);
+            push = xmlFile.pushTag("PropertiesGraphicsPolyLine", l);
+//            if (push)
+//                printf("polyLine %i OK\n", l);
+//            else
+//                printf("polyLine %i FAILED\n", l);
+            
+            push = xmlFile.pushTag("Points");
+//            if (push) printf("Points OK\n");
+            
+            int numPts = xmlFile.getNumTags("Point");
+//            printf("num points read in line = %i\n", numPts);
+            
+            if (numPts>0) {
+                for (int i=0; i<numPts; i++) {
+                    double x = xmlFile.getValue("Point:X", 0.0, i);
+                    double y = xmlFile.getValue("Point:Y", 0.0, i);
+                    if (x>x_max) x_max = x;
+                    if (x<x_min) x_min = x;
+                    if (y>y_max) y_max = y;
+                    if (y<y_min) y_min = y;
+                    //printf("x:y = %f:%f\n", x,y);
+                }
+            }
+            xmlFile.popTag();
+            xmlFile.popTag();
+        }
+        printf("x_min x_max: %f %f\n", x_min, x_max);
+        printf("y_min y_max: %f %f\n", y_min, y_max);
+    }
+
     
     startList.resize( tlSize );
     stopList.resize( tlSize );
