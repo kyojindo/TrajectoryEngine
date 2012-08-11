@@ -15,27 +15,6 @@ void testApp::setup( void ) {
     
     zoomFactor = 1.0f; playAsLoop = true;
     isSliding = false; drawBPFs = true;
-    
-    //test load data
-    if (xmlFile.loadFile("data.xml")){
-		printf("data.xml loaded!\n");
-	}else{
-		printf("unable to load data.xml check data/ folder");
-	}
-    bool push = xmlFile.pushTag("Graphics");
-    if (push) printf("OK\n");
-    push = xmlFile.pushTag("Graphics");
-    if (push) printf("OK\n");
-    int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
-    printf("num lines read in data = %i\n", numLines);
-    push = xmlFile.pushTag("PropertiesGraphicsPolyLine");
-    if (push) printf("OK\n");
-    push = xmlFile.pushTag("Points");
-    if (push) printf("OK\n");
-    
-    int numPts = xmlFile.getNumTags("Point");
-    printf("num points read in line = %i\n", numPts);
-    
 }
 
 void testApp::exit( void ) {

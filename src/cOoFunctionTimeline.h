@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "cOoBreakPointFunction.h"
+#include "ofxXmlSettings.h"
 
 using namespace std;
 

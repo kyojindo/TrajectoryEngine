@@ -9,7 +9,6 @@
 
 #include "ofMain.h"
 #include "ofxOsc.h"
-#include "ofxXmlSettings.h"
 
 using namespace cOo;
 
@@ -81,6 +80,4 @@ class testApp : public ofBaseApp {
     bool isSliding;
     bool drawBPFs;
     
-    // - XML loader --
-    ofxXmlSettings xmlFile;
 };

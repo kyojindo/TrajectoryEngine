@@ -3,6 +3,7 @@
 cOo::FunctionTimeline::FunctionTimeline( void ) {
     
     startHead = stopHead = 0;
+
 }
 
 cOo::FunctionTimeline::~FunctionTimeline( void ) {
@@ -18,6 +19,28 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
     long id = 1;
     double startTime;
     DataSet dataSet;
+    ofxXmlSettings xmlFile;
+    
+    //test load data
+    if (xmlFile.loadFile("data.xml")){
+		printf("data.xml loaded!\n");
+	}else{
+		printf("unable to load data.xml check data/ folder");
+	}
+    bool push = xmlFile.pushTag("Graphics");
+    if (push) printf("OK\n");
+    push = xmlFile.pushTag("Graphics");
+    if (push) printf("OK\n");
+    int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
+    printf("num lines read in data = %i\n", numLines);
+    push = xmlFile.pushTag("PropertiesGraphicsPolyLine");
+    if (push) printf("OK\n");
+    push = xmlFile.pushTag("Points");
+    if (push) printf("OK\n");
+    
+    int numPts = xmlFile.getNumTags("Point");
+    printf("num points read in line = %i\n", numPts);
+    
     
     startList.resize( tlSize );
     stopList.resize( tlSize );
