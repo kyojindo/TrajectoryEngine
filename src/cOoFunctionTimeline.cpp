@@ -135,7 +135,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         dataSet.velocity = (double)rand() / (double)RAND_MAX;
         
         // and start from a random time in virtual time ( earliest = 0.5 from start )
-        dataSet.time = vuzikLines[id-1].getX(0)*50.0/(x_in_max-x_in_min);
+        dataSet.time = vuzikLines[id-1].getX(0)*maxTime/(x_in_max-x_in_min);
         
         for( long k=0; k<bpfSize; k++ ) {
         
@@ -144,7 +144,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
             dataSet.velocity += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
             
-            dataSet.time = vuzikLines[id-1].getX(k)*50.0/(x_in_max-x_in_min);
+            dataSet.time = vuzikLines[id-1].getX(k)*maxTime/(x_in_max-x_in_min);
             
         }
     }
@@ -358,5 +358,5 @@ void cOo::FunctionTimeline::print( void ) {
 }
 
 double cOo::FunctionTimeline::tempPitchConverter(double in_p) {
-    return pitch_out_min+ in_p*(pitch_out_max-pitch_out_min)/(pitch_in_max-pitch_in_min);
+    return pitch_out_min+ (pitch_in_max-in_p)*(pitch_out_max-pitch_out_min)/(pitch_in_max-pitch_in_min);
 }
