@@ -8,7 +8,6 @@ void testApp::setup( void ) {
     ofEnableAlphaBlending(); ofEnableSmoothing();
     ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
     
-
     timeline.load( 8*10, 32, 20.0f ); // load the XML file with th score
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
@@ -18,11 +17,10 @@ void testApp::setup( void ) {
         (*skc).set( (*bpf), &screenMapper ); // link every BPF to its rendering object
     }
     
+    zoomFactor = 1.0f; playAsLoop = true; isSliding = false;
+    
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000
-    
-    zoomFactor = 1.0f; playAsLoop = true;
-    isSliding = false; drawBPFs = true;
     
     zoomTimeline( zoomFactor );
 }
@@ -41,13 +39,13 @@ void testApp::update( void ) {
         oscReceiver.getNextMessage( &m );
         
         if( m.getAddress() == "/play" ) startPlayback();
-        if( m.getAddress() == "/stop" ) stopPlayback();
         if( m.getAddress() == "/pause" ) pausePlayback();
+        if( m.getAddress() == "/stop" ) stopPlayback();
+        
+        if( m.getAddress() == "/move" ) movePlaybackTime( (Time)m.getArgAsFloat( 0 ) );
         
         if( m.getAddress() == "/zoom" ) zoomTimeline( (double)m.getArgAsFloat( 0 ) );
         if( m.getAddress() == "/shift" ) moveTimeline( (Time)m.getArgAsFloat( 0 ) );
-        
-        if( m.getAddress() == "/move" ) movePlaybackTime( (Time)m.getArgAsFloat( 0 ) );
     }
 }
 
@@ -229,16 +227,6 @@ void testApp::sendTouchedAsOscMessages( void ) {
         
         oscSender.sendMessage( message );
     }
-}
-
-float testApp::getXfromTime( Time time, Time offset, double pps ) {
-    
-    return( ofMap( time, -offset, 1-offset, 0, pps ) );
-}
-
-Time testApp::getTimefromX( float x, Time offset, double pps ) {
-    
-    return( (Time)ofMap( x, 0, pps, -offset, 1-offset ) );
 }
 
 void testApp::playbackTimeInc( void *usrPtr ) {

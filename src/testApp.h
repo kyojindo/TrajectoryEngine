@@ -46,38 +46,24 @@ class testApp : public ofBaseApp {
     
   protected:
     
-    // - method to send OSC messages -
-    void sendTouchedAsOscMessages( void );
+    void sendTouchedAsOscMessages( void ); // send OSC messages
+    static void playbackTimeInc( void *usrPtr ); // increment the playback head
     
-    // - methods to go switch between x pixels and time --
-    float getXfromTime( Time time, Time offset, double pps );
-    Time getTimefromX( float x, Time offset, double pps );
+    FunctionTimeline timeline; // timeline of breakpoint functions
+    vector<Record> tTouched, uTouched, dTouched, sTouched; // touched
     
-    // - methods to manipulate the playback -
-    static void playbackTimeInc( void *usrPtr );
+    ScreenMapper screenMapper; // time/screen mapping object
+    list<SketchedCurve> sketchedCurve; // curve rendering objects
     
-    // - timeline of breakpoint functions ---
-    FunctionTimeline timeline; // BPF timeline
+    ofxOscSender oscSender; // OSC sender
+    ofxOscReceiver oscReceiver; // OSC receiver
+    ofxOscMessage message; // OSC message
     
-    // - duplicated touched ( for memory barriers ) ----
-    vector<Record> tTouched, uTouched, dTouched, sTouched;
+    AudioTimer timer; // audio-based timer with callback registration
+    ofMutex playbackAccess; // mutex for accessing the playback head
+    Time playbackTime; // playback head in seconds ( shared mem )
+    bool playAsLoop; // flag to set if we play as loop or not
     
-    // - display -------------------
-    list<SketchedCurve> sketchedCurve;
-    ScreenMapper screenMapper;
-    
-    // - OSC interface -----
-    ofxOscReceiver oscReceiver;
-    ofxOscSender oscSender;
-    ofxOscMessage message;
-    
-    // - playback -
-    AudioTimer timer;
-    ofMutex playbackAccess;
-    Time playbackTime;
-    bool playAsLoop;
-    
-    double zoomFactor;
-    bool isSliding;
-    bool drawBPFs;
+    double zoomFactor; // stored zoom factor on the score
+    bool isSliding; // flag to detect if the score slides
 };

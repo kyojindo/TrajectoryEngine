@@ -188,8 +188,6 @@
 				9F717B3D15D164D2004EAAAA /* cOoDataSet.cpp */,
 				9F717B3E15D164D2004EAAAA /* cOoDataSet.h */,
 				9F717B4115D164D2004EAAAA /* cOoRecord.h */,
-				D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */,
-				D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */,
 			);
 			name = FunctionTimeline;
 			sourceTree = "<group>";
@@ -310,11 +308,21 @@
 		9F717B4515D164DB004EAAAA /* TrajectoryEngine */ = {
 			isa = PBXGroup;
 			children = (
-				9F1E5F1E15D269DC00194F56 /* AudioTimer */,
 				9F1E5F1D15D269BC00194F56 /* FunctionTimeline */,
+				9F1E5F1E15D269DC00194F56 /* AudioTimer */,
 				9FC5BC3315DA552B0076638F /* Rendering */,
+				9FC1F84515DA73A400D91E9F /* Import */,
 			);
 			name = TrajectoryEngine;
+			sourceTree = "<group>";
+		};
+		9FC1F84515DA73A400D91E9F /* Import */ = {
+			isa = PBXGroup;
+			children = (
+				D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */,
+				D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */,
+			);
+			name = Import;
 			sourceTree = "<group>";
 		};
 		9FC5BC3315DA552B0076638F /* Rendering */ = {
