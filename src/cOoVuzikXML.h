@@ -24,6 +24,10 @@ namespace cOo {
         
         long getSize() {return numPts;}
         
+        int alpha;
+        int red;
+        int green;
+        int blue;
         
     private:
         
@@ -33,10 +37,7 @@ namespace cOo {
         
         double lineWidth;
         
-        int alpha;
-        int red;
-        int green;
-        int blue;
+
     };
 }
 

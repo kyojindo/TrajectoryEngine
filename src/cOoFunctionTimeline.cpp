@@ -128,6 +128,11 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         // set the BPF properties
         (*t)->setProperties( id, 0 );
         
+        (*t)->a = vuzikLines[id-1].alpha;
+        (*t)->r = vuzikLines[id-1].red;
+        (*t)->g = vuzikLines[id-1].green;
+        (*t)->b = vuzikLines[id-1].blue;
+        
         bpfSize = vuzikLines[id-1].getSize();
         
         dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(0));

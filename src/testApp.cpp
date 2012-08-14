@@ -77,7 +77,7 @@ void testApp::draw( void ) {
                 yCurrent = ofMap( current.data.getPitch(), 0, 1, ofGetHeight(), 0 );
                 xCurrent = getXfromTime( current.data.time, timeOffset, pixelPerSec );
                 
-                ofSetColor( bpfColor, bpfColor, bpfColor, 200 );
+                ofSetColor( (*bpf)->r,(*bpf)->g,(*bpf)->b, (*bpf)->a );
                 ofLine( xPrevious, yPrevious, xCurrent, yCurrent );
             }
             
@@ -89,7 +89,7 @@ void testApp::draw( void ) {
                 yCurrent = ofMap( current.data.getPitch(), 0, 1, ofGetHeight(), 0 );
                 xCurrent = getXfromTime( current.data.time, timeOffset, pixelPerSec );
                 
-                ofSetColor( bpfColor, bpfColor, bpfColor, 220 );
+                ofSetColor( (*bpf)->r,(*bpf)->g,(*bpf)->b, (*bpf)->a );
                 ofNoFill(); ofCircle( xCurrent, yCurrent, 3 );
             }
         }
