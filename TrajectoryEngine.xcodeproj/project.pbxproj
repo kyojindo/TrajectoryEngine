@@ -22,6 +22,8 @@
 		9F717B4215D164D2004EAAAA /* cOoBreakPointFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F717B3B15D164D2004EAAAA /* cOoBreakPointFunction.cpp */; };
 		9F717B4315D164D2004EAAAA /* cOoDataSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F717B3D15D164D2004EAAAA /* cOoDataSet.cpp */; };
 		9F717B4415D164D2004EAAAA /* cOoFunctionTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F717B3F15D164D2004EAAAA /* cOoFunctionTimeline.cpp */; };
+		9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */; };
+		9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		D59B777815D9AACD00DFBF18 /* cOoVuzikXML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -116,6 +118,10 @@
 		9F717B3F15D164D2004EAAAA /* cOoFunctionTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoFunctionTimeline.cpp; sourceTree = "<group>"; };
 		9F717B4015D164D2004EAAAA /* cOoFunctionTimeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoFunctionTimeline.h; sourceTree = "<group>"; };
 		9F717B4115D164D2004EAAAA /* cOoRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoRecord.h; sourceTree = "<group>"; };
+		9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoSketchedCurve.cpp; sourceTree = "<group>"; };
+		9FC5BC3615DA56400076638F /* cOoSketchedCurve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoSketchedCurve.h; sourceTree = "<group>"; };
+		9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoScreenMapper.cpp; sourceTree = "<group>"; };
+		9FC5BC3915DA5D930076638F /* cOoScreenMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoScreenMapper.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoVuzikXML.h; sourceTree = "<group>"; };
 		D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoVuzikXML.cpp; sourceTree = "<group>"; };
@@ -291,14 +297,14 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		9F717B3A15D1632C004EAAAA /* products */ = {
+		9F717B3A15D1632C004EAAAA /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4B69B5B0A3A1756003C02F2 /* TrajectoryEngine.app */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
 			);
-			name = products;
+			name = Products;
 			sourceTree = "<group>";
 		};
 		9F717B4515D164DB004EAAAA /* TrajectoryEngine */ = {
@@ -306,17 +312,39 @@
 			children = (
 				9F1E5F1E15D269DC00194F56 /* AudioTimer */,
 				9F1E5F1D15D269BC00194F56 /* FunctionTimeline */,
+				9FC5BC3315DA552B0076638F /* Rendering */,
 			);
 			name = TrajectoryEngine;
 			sourceTree = "<group>";
 		};
-		BB4B014C10F69532006C3DED /* addons */ = {
+		9FC5BC3315DA552B0076638F /* Rendering */ = {
+			isa = PBXGroup;
+			children = (
+				9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */,
+				9FC5BC3915DA5D930076638F /* cOoScreenMapper.h */,
+				9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */,
+				9FC5BC3615DA56400076638F /* cOoSketchedCurve.h */,
+			);
+			name = Rendering;
+			sourceTree = "<group>";
+		};
+		9FC5BC3415DA555D0076638F /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
+				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
+				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
+			);
+			name = Application;
+			sourceTree = "<group>";
+		};
+		BB4B014C10F69532006C3DED /* Addons */ = {
 			isa = PBXGroup;
 			children = (
 				F7A4B98515D5D3450061BF3E /* ofxXmlSettings */,
 				9F1E5F2915D2D05900194F56 /* ofxOsc */,
 			);
-			name = addons;
+			name = Addons;
 			sourceTree = "<group>";
 		};
 		BBAB23C913894ECA00AA2426 /* system frameworks */ = {
@@ -354,35 +382,33 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E45BE5980E8CC70C009D7055 /* frameworks */ = {
+		E45BE5980E8CC70C009D7055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				E4EEC9E9138DF44700A80321 /* openFrameworks */,
 				BBAB23CA13894EDB00AA2426 /* 3rd party frameworks */,
 				BBAB23C913894ECA00AA2426 /* system frameworks */,
 			);
-			name = frameworks;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
-				E4B69E1C0A3A1BDC003C02F2 /* sources */,
-				E45BE5980E8CC70C009D7055 /* frameworks */,
-				9F717B3A15D1632C004EAAAA /* products */,
-				BB4B014C10F69532006C3DED /* addons */,
+				E4B69E1C0A3A1BDC003C02F2 /* Sources */,
+				E45BE5980E8CC70C009D7055 /* Frameworks */,
+				9F717B3A15D1632C004EAAAA /* Products */,
+				BB4B014C10F69532006C3DED /* Addons */,
 			);
 			sourceTree = "<group>";
 		};
-		E4B69E1C0A3A1BDC003C02F2 /* sources */ = {
+		E4B69E1C0A3A1BDC003C02F2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				9F717B4515D164DB004EAAAA /* TrajectoryEngine */,
-				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
-				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
-				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
+				9FC5BC3415DA555D0076638F /* Application */,
 			);
-			name = sources;
+			name = Sources;
 			path = src;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -531,6 +557,8 @@
 				F7A4B99015D5D3450061BF3E /* tinyxmlparser.cpp in Sources */,
 				F7A4B99115D5D3450061BF3E /* ofxXmlSettings.cpp in Sources */,
 				D59B777815D9AACD00DFBF18 /* cOoVuzikXML.cpp in Sources */,
+				9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */,
+				9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

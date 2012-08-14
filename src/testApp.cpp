@@ -2,19 +2,29 @@
 
 void testApp::setup( void ) {
     
-    ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
-    ofEnableAlphaBlending(); ofEnableSmoothing();
+    list<SketchedCurve>::iterator skc;
+    list<BreakPointFunction *>::iterator bpf;
     
-    timeline.load( 8*10, 20, 50.0f ); // [TODO] load( filename vuzikFile )
+    ofEnableAlphaBlending(); ofEnableSmoothing();
+    ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
+    
+
+    timeline.load( 8*10, 32, 20.0f ); // load the XML file with th score
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
+    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
+    
+    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!=timeline.getEnd(); bpf++, skc++ ) {
+        
+        (*skc).set( (*bpf), &screenMapper ); // link every BPF to its rendering object
+    }
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000
     
-    zoomTimeline( 1.0f ); timeOffset = 0.0;
-    
     zoomFactor = 1.0f; playAsLoop = true;
     isSliding = false; drawBPFs = true;
+    
+    zoomTimeline( zoomFactor );
 }
 
 void testApp::exit( void ) {
@@ -43,70 +53,29 @@ void testApp::update( void ) {
 
 void testApp::draw( void ) {
     
-    int bpfColor;
+    float tVal, xTouch, yTouch;
+    list<SketchedCurve>::iterator skc;
     
-    float xVal, yVal, rVal;
-    Record current, previous;
+    OSMemoryBarrier(); dTouched = sTouched;
     
-    float xPrevious, yPrevious;
-    float xCurrent, yCurrent;
+    for( skc=sketchedCurve.begin();
+    skc!=sketchedCurve.end(); skc++ ) {
     
-    float xTouch, yTouch;
-    
-    float tVal;
-    
-    OSMemoryBarrier();
-    dTouched = sTouched;
-    
-    if( drawBPFs ) {
-        
-        for( bpf=timeline.getBegin(); bpf!=timeline.getEnd(); bpf++ ) {
-            
-            if( (*bpf)->isActive() ) bpfColor = 200;
-            else bpfColor = 100; // active = light
-            
-            // line between each point of the BPF
-            for( long k=1; k<(*bpf)->getSize(); k++ ) {
-                
-                (*bpf)->getRecord( k-1, previous );
-                (*bpf)->getRecord( k, current );
-                
-                yPrevious = ofMap( previous.data.getPitch(), 0, 1, ofGetHeight(), 0 );
-                xPrevious = getXfromTime( previous.data.time, timeOffset, pixelPerSec );
-                
-                yCurrent = ofMap( current.data.getPitch(), 0, 1, ofGetHeight(), 0 );
-                xCurrent = getXfromTime( current.data.time, timeOffset, pixelPerSec );
-                
-                ofSetColor( (*bpf)->r,(*bpf)->g,(*bpf)->b, (*bpf)->a );
-                ofLine( xPrevious, yPrevious, xCurrent, yCurrent );
-            }
-            
-            // circle on each point of the BPF
-            for( long k=0; k<(*bpf)->getSize(); k++ ) {
-                
-                (*bpf)->getRecord( k, current );
-                
-                yCurrent = ofMap( current.data.getPitch(), 0, 1, ofGetHeight(), 0 );
-                xCurrent = getXfromTime( current.data.time, timeOffset, pixelPerSec );
-                
-                ofSetColor( (*bpf)->r,(*bpf)->g,(*bpf)->b, (*bpf)->a );
-                ofNoFill(); ofCircle( xCurrent, yCurrent, 3 );
-            }
-        }
+        (*skc).draw();
     }
     
     playbackAccess.lock();
     
     // get the playback head position on the screen
-    tVal = getXfromTime( playbackTime, timeOffset, pixelPerSec );
+    tVal = screenMapper.getXfromTime( playbackTime );
     isSliding = false; // tricky flag to cheat on position
     
     if( tVal > ofGetWidth()/2 && timeline.getMaxTime() >
-    getTimefromX( ofGetWidth(), timeOffset, pixelPerSec ) ) {
-    
-        // shift the time offset to stay centered @ playback
-        timeOffset -= playbackTime-getTimefromX( ofGetWidth()/2,
-        timeOffset, pixelPerSec ); isSliding = true;
+    screenMapper.getTimefromX( ofGetWidth() ) ) {
+        
+        screenMapper.incTimeOffset( -( playbackTime-
+        screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
+        isSliding = true; // shift to stay centered
     }
     
     playbackAccess.unlock();
@@ -118,7 +87,7 @@ void testApp::draw( void ) {
     for( long k=0; k<dTouched.size(); k++ ) {
         
         yTouch = ofMap( dTouched[k].data.getPitch(), 0, 1, ofGetHeight(), 0 );
-        xTouch = getXfromTime( dTouched[k].data.time, timeOffset, pixelPerSec );
+        xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
         
         if( isSliding ) xTouch += 4; // trick to avoid circles to be behind
         
@@ -155,25 +124,16 @@ void testApp::movePlaybackTime( Time time ) {
 
 void testApp::zoomTimeline( double factor ) {
     
-    // no no, we cannot unzoom to infinite
     if( factor < 0.000001f ) factor = 0.000001f;
-    
-    // save the pixel position of the playback time in current window
-    float pOffset = getXfromTime( playbackTime, timeOffset, pixelPerSec );
-    
-    // update boundaries from the new zooming factor
-    pixelPerSec = factor * ( ofGetWidth() / 10.0f );
-    
-    // compute time of the previous playback position in new window
-    double newPbt = getTimefromX( pOffset, timeOffset, pixelPerSec );
-    
-    // shift offset to preserve position
-    timeOffset += ( newPbt-playbackTime );
+    float pOffset = screenMapper.getXfromTime( playbackTime );
+    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 10.0f ) );
+    double newPbt = screenMapper.getTimefromX( pOffset );
+    screenMapper.incTimeOffset( newPbt-playbackTime );
 }
 
 void testApp::moveTimeline( Time shift ) {
 
-    timeOffset += shift;
+    screenMapper.incTimeOffset( shift );
 }
 
 void testApp::startPlayback( void ) {
@@ -220,7 +180,7 @@ void testApp::keyReleased( int key ){
 
 void testApp::mousePressed( int x, int y, int button ) {
     
-    movePlaybackTime( getTimefromX( x, timeOffset, pixelPerSec ) );
+    movePlaybackTime( screenMapper.getTimefromX( x ) );
 }
 
 void testApp::mouseReleased( int x, int y, int button ) {
@@ -230,7 +190,7 @@ void testApp::mouseReleased( int x, int y, int button ) {
 
 void testApp::mouseDragged( int x, int y, int button ) {
     
-    movePlaybackTime( getTimefromX( x, timeOffset, pixelPerSec ) );
+    movePlaybackTime( screenMapper.getTimefromX( x ) );
 }
 
 void testApp::mouseMoved( int x, int y ) {
@@ -290,9 +250,11 @@ void testApp::playbackTimeInc( void *usrPtr ) {
     if( app->playbackTime > app->timeline.getMaxTime() ) {
         
         app->playbackAccess.unlock();
+        
         if( !app->playAsLoop ) app->timer.stop();
+        
         app->movePlaybackTime( 0.0f );
-        app->timeOffset = 0.0f;
+        app->screenMapper.setTimeOffset( 0.0f );
         
     } else {
     

@@ -2,13 +2,14 @@
 
 #include <list>
 #include <vector>
-#include <deque>
-
-#include "cOoFunctionTimeline.h"
-#include "cOoAudioTimer.h"
 
 #include "ofMain.h"
 #include "ofxOsc.h"
+
+#include "cOoAudioTimer.h"
+#include "cOoFunctionTimeline.h"
+#include "cOoSketchedCurve.h"
+#include "cOoScreenMapper.h"
 
 using namespace cOo;
 
@@ -57,14 +58,17 @@ class testApp : public ofBaseApp {
     
     // - timeline of breakpoint functions ---
     FunctionTimeline timeline; // BPF timeline
-    list<BreakPointFunction *>::iterator bpf;
     
-    // - duplicated touched ( for memory barriers tricks )
+    // - duplicated touched ( for memory barriers ) ----
     vector<Record> tTouched, uTouched, dTouched, sTouched;
     
-    // - OSC interface --
-    ofxOscSender oscSender;
+    // - display -------------------
+    list<SketchedCurve> sketchedCurve;
+    ScreenMapper screenMapper;
+    
+    // - OSC interface -----
     ofxOscReceiver oscReceiver;
+    ofxOscSender oscSender;
     ofxOscMessage message;
     
     // - playback -
@@ -73,11 +77,7 @@ class testApp : public ofBaseApp {
     Time playbackTime;
     bool playAsLoop;
     
-    // - display --
-    double timeOffset;
-    double pixelPerSec;
     double zoomFactor;
     bool isSliding;
     bool drawBPFs;
-    
 };
