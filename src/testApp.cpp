@@ -6,23 +6,25 @@ void testApp::setup( void ) {
     list<BreakPointFunction *>::iterator bpf;
     
     ofEnableAlphaBlending(); ofEnableSmoothing();
-    ofSetFrameRate( 25 ); ofBackground( 30, 30, 30 );
+    ofSetFrameRate( 120 ); ofBackground( 10, 10, 10 );
     
-    timeline.load( 8*10, 32, 20.0f ); // load the XML file with th score
+    timeline.load( 8*10, 32, 3.0f*60.0f ); // load the XML file with th score
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     
-    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!=timeline.getEnd(); bpf++, skc++ ) {
-        
-        (*skc).set( (*bpf), &screenMapper ); // link every BPF to its rendering object
-    }
-    
-    zoomFactor = 1.0f; playAsLoop = true; isSliding = false;
+    // link each BPF to its FBO rendering object and give it a first full rendering
+    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
+    bpf++, skc++ ) { (*skc).set( (*bpf), &screenMapper ); (*skc).redrawFbo(); }
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000
     
+    zoomFactor = 1.0f; // zoom
     zoomTimeline( zoomFactor );
+    
+    fullScreen = false;
+    playAsLoop = true;
+    isSliding = false;
 }
 
 void testApp::exit( void ) {
@@ -96,10 +98,19 @@ void testApp::draw( void ) {
     ofSetColor( 200, 200, 200 ); // draw playback time
     
     playbackAccess.lock();
-    ofDrawBitmapString( ofToString( playbackTime ), 25, 30 );
+    ofDrawBitmapString( ofToString( playbackTime ), 20, 30 );
     playbackAccess.unlock();
+}
+
+void testApp::redraw( void ) {
+
+    list<SketchedCurve>::iterator skc;
     
-    ofDrawBitmapString( ofToString( dTouched.size() ), 25, 60 );
+    for( skc=sketchedCurve.begin();
+    skc!=sketchedCurve.end(); skc++ ) {
+        
+        (*skc).redrawFbo();
+    }
 }
 
 void testApp::movePlaybackTime( Time time ) {
@@ -123,10 +134,13 @@ void testApp::movePlaybackTime( Time time ) {
 void testApp::zoomTimeline( double factor ) {
     
     if( factor < 0.000001f ) factor = 0.000001f;
+    
     float pOffset = screenMapper.getXfromTime( playbackTime );
-    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 10.0f ) );
+    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 20.0f ) );
     double newPbt = screenMapper.getTimefromX( pOffset );
     screenMapper.incTimeOffset( newPbt-playbackTime );
+    
+    redraw();
 }
 
 void testApp::moveTimeline( Time shift ) {
@@ -162,6 +176,12 @@ void testApp::keyPressed( int key ) {
         if( !isPlaying() ) startPlayback();
         else if( isPlaying() ) pausePlayback();
     }
+    
+    if( key == 'f' ) {
+        
+        fullScreen = !fullScreen;
+        ofSetFullscreen( fullScreen );
+    }
 
     if( key == '+' ) { zoomFactor+=0.1; zoomTimeline( zoomFactor ); }
     if( key == '-' ) { zoomFactor-=0.1; zoomTimeline( zoomFactor ); }
@@ -173,7 +193,7 @@ void testApp::keyPressed( int key ) {
 
 void testApp::keyReleased( int key ){
 
-    
+    if( key == 'f' ) redraw();
 }
 
 void testApp::mousePressed( int x, int y, int button ) {
@@ -250,8 +270,7 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         app->timeline.getNextTouched( app->tTouched, app->playbackTime );
         app->playbackAccess.unlock();
         
-        OSMemoryBarrier();
-        app->sTouched = app->tTouched;
+        OSMemoryBarrier(); app->sTouched = app->tTouched;
         
         app->sendTouchedAsOscMessages();
     }

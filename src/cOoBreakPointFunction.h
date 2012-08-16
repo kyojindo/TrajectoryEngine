@@ -41,8 +41,8 @@ namespace cOo {
         // this one is just to display the records
         void getRecord( long index, Record &fromQuery );
         
-        Time getStartTime( void );
-        Time getStopTime( void );
+        Time getStartTime( void ); Time getStopTime( void );
+        Time getMinTime( void ); Time getMaxTime( void );
         
         void activate( void );
         void deactivate( void );

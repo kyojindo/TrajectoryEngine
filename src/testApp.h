@@ -23,6 +23,7 @@ class testApp : public ofBaseApp {
     void update( void );
     void draw( void );
     
+    void redraw( void );
     void movePlaybackTime( Time time );
     void zoomTimeline( double factor );
     void moveTimeline( Time shift );
@@ -46,18 +47,14 @@ class testApp : public ofBaseApp {
     
   protected:
     
-    void sendTouchedAsOscMessages( void ); // send OSC messages
-    static void playbackTimeInc( void *usrPtr ); // increment the playback head
+    static void playbackTimeInc( void *usrPtr ); // increment the pb head position
+    void sendTouchedAsOscMessages( void ); // send OSC messages for touched sets
     
     FunctionTimeline timeline; // timeline of breakpoint functions
     vector<Record> tTouched, uTouched, dTouched, sTouched; // touched
     
     ScreenMapper screenMapper; // time/screen mapping object
-    list<SketchedCurve> sketchedCurve; // curve rendering objects
-    
-    ofxOscSender oscSender; // OSC sender
-    ofxOscReceiver oscReceiver; // OSC receiver
-    ofxOscMessage message; // OSC message
+    list<SketchedCurve> sketchedCurve; // curve rendering obj
     
     AudioTimer timer; // audio-based timer with callback registration
     ofMutex playbackAccess; // mutex for accessing the playback head
@@ -66,4 +63,9 @@ class testApp : public ofBaseApp {
     
     double zoomFactor; // stored zoom factor on the score
     bool isSliding; // flag to detect if the score slides
+    bool fullScreen; // flag to redraw all the curves
+    
+    ofxOscReceiver oscReceiver; // OSC receiver
+    ofxOscSender oscSender; // OSC sender
+    ofxOscMessage message; // message
 };

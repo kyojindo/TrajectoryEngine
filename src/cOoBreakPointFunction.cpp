@@ -132,6 +132,32 @@ cOo::Time cOo::BreakPointFunction::getStopTime( void ) {
     return( time );
 }
 
+cOo::Time cOo::BreakPointFunction::getMinTime( void ) {
+
+    RecordIter it;
+    Time time = 1000000.0f;
+    
+    for( it=record.begin(); it!=record.end(); it++ ) {
+    
+        if( (*it).data.time < time ) time = (*it).data.time;
+    }
+    
+    return( time );
+}
+
+cOo::Time cOo::BreakPointFunction::getMaxTime( void ) {
+
+    RecordIter it;
+    Time time = 0.0f;
+    
+    for( it=record.begin(); it!=record.end(); it++ ) {
+        
+        if( (*it).data.time > time ) time = (*it).data.time;
+    }
+    
+    return( time );
+}
+
 long cOo::BreakPointFunction::getType( void ) {
 
     return( type );

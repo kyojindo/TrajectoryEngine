@@ -13,20 +13,16 @@ namespace cOo {
       public:
         
         void set( BreakPointFunction *function, ScreenMapper *smap );
-        
-        void draw( void );
+        void redrawFbo( void ); void draw( void ); // ------------
         
       protected:
         
-        ScreenMapper *screenMapper;
         BreakPointFunction *bpf;
+        ScreenMapper *screenMapper;
         
-        float xVal, yVal, rVal;
-        Record current, previous;
-        float xPrevious, yPrevious;
-        float xCurrent, yCurrent;
-        
-        int bpfColor;
+        float fboWidth;
+        float fboHeight;
+        ofFbo *fbo;
     };
 }
 
