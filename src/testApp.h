@@ -23,7 +23,6 @@ class testApp : public ofBaseApp {
     void update( void );
     void draw( void );
     
-    void redraw( void );
     void movePlaybackTime( Time time );
     void zoomTimeline( double factor );
     void moveTimeline( Time shift );
@@ -49,6 +48,7 @@ class testApp : public ofBaseApp {
     
     static void playbackTimeInc( void *usrPtr ); // increment the pb head position
     void sendTouchedAsOscMessages( void ); // send OSC messages for touched sets
+    void regenerateVisibleCurves( void ); // regenerate visible FBO curves
     
     FunctionTimeline timeline; // timeline of breakpoint functions
     vector<Record> tTouched, uTouched, dTouched, sTouched; // touched
@@ -68,4 +68,6 @@ class testApp : public ofBaseApp {
     ofxOscReceiver oscReceiver; // OSC receiver
     ofxOscSender oscSender; // OSC sender
     ofxOscMessage message; // message
+    
+    long nOfAllocated;
 };

@@ -2,7 +2,7 @@
 
 cOo::ScreenMapper::ScreenMapper( void ) {
 
-    pixelPerSec = 50.0f;
+    pixelPerSec = 200.0f;
     timeOffset = 0.0f;
 }
 

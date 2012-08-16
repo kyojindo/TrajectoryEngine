@@ -14,7 +14,7 @@ void testApp::setup( void ) {
     
     // link each BPF to its FBO rendering object and give it a first full rendering
     for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
-    bpf++, skc++ ) { (*skc).set( (*bpf), &screenMapper ); (*skc).redrawFbo(); }
+    bpf++, skc++ ) { (*skc).link( (*bpf), &screenMapper ); } // -------------------
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000
@@ -33,6 +33,14 @@ void testApp::exit( void ) {
 }
 
 void testApp::update( void ) {
+    
+    nOfAllocated = 0;
+    list<SketchedCurve>::iterator skc;
+    
+    for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end(); skc++ ) {
+        
+        if( (*skc).fbo != NULL ) nOfAllocated++;
+    }
     
     ofxOscMessage m;
     
@@ -56,7 +64,8 @@ void testApp::draw( void ) {
     float tVal, xTouch, yTouch;
     list<SketchedCurve>::iterator skc;
     
-    OSMemoryBarrier(); dTouched = sTouched;
+    OSMemoryBarrier();
+    dTouched = sTouched;
     
     for( skc=sketchedCurve.begin();
     skc!=sketchedCurve.end(); skc++ ) {
@@ -100,17 +109,8 @@ void testApp::draw( void ) {
     playbackAccess.lock();
     ofDrawBitmapString( ofToString( playbackTime ), 20, 30 );
     playbackAccess.unlock();
-}
-
-void testApp::redraw( void ) {
-
-    list<SketchedCurve>::iterator skc;
     
-    for( skc=sketchedCurve.begin();
-    skc!=sketchedCurve.end(); skc++ ) {
-        
-        (*skc).redrawFbo();
-    }
+    ofDrawBitmapString( ofToString( nOfAllocated ), 20, 60 );
 }
 
 void testApp::movePlaybackTime( Time time ) {
@@ -136,11 +136,11 @@ void testApp::zoomTimeline( double factor ) {
     if( factor < 0.000001f ) factor = 0.000001f;
     
     float pOffset = screenMapper.getXfromTime( playbackTime );
-    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 20.0f ) );
+    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 10.0f ) );
     double newPbt = screenMapper.getTimefromX( pOffset );
     screenMapper.incTimeOffset( newPbt-playbackTime );
     
-    redraw();
+    regenerateVisibleCurves();
 }
 
 void testApp::moveTimeline( Time shift ) {
@@ -192,8 +192,8 @@ void testApp::keyPressed( int key ) {
 }
 
 void testApp::keyReleased( int key ){
-
-    if( key == 'f' ) redraw();
+    
+    if( key == 'f' ) regenerateVisibleCurves();
 }
 
 void testApp::mousePressed( int x, int y, int button ) {
@@ -273,5 +273,15 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         OSMemoryBarrier(); app->sTouched = app->tTouched;
         
         app->sendTouchedAsOscMessages();
+    }
+}
+
+void testApp::regenerateVisibleCurves( void ) {
+
+    list<SketchedCurve>::iterator skc;
+    
+    for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end(); skc++ ) {
+        
+        if( (*skc).isVisible() ) (*skc).generate();
     }
 }

@@ -1,19 +1,22 @@
 #include "cOoSketchedCurve.h"
 
-void cOo::SketchedCurve::set( BreakPointFunction *function, ScreenMapper *smap ) {
+void cOo::SketchedCurve::link( BreakPointFunction *function, ScreenMapper *smap ) {
 
+    visible = false; fbo = NULL;
     bpf = function; screenMapper = smap;
     ofSetLogLevel( OF_LOG_ERROR );
 }
 
-void cOo::SketchedCurve::redrawFbo( void ) {
+void cOo::SketchedCurve::generate( void ) {
     
+    float radius, pitch, time;
     Record record; ofPath path; ofColor color;
     
-    fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() ) * screenMapper->getPixelPerSec() + 128;
-    //if( fboWidth < 16.0f ) fboWidth = 16.0f; fboHeight = ofGetHeight(); // FBO size
+    fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() )
+    * screenMapper->getPixelPerSec() + 32.0f;
+    fboHeight = ofGetHeight();
     
-    if( fbo ) delete fbo; fbo = new ofFbo(); // realloc
+    if( fbo != NULL ) delete fbo; fbo = new ofFbo();
     fbo->allocate( fboWidth, fboHeight, GL_RGBA32F_ARB );
     
     fbo->begin();
@@ -23,34 +26,34 @@ void cOo::SketchedCurve::redrawFbo( void ) {
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glHint( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
     
-    float rHue = ofRandom( 0, 255 );
+    //float rHue = ofRandom( 0, 255 );
     
-    for( int k=0; k<32; k++ ) {
+    for( int k=0; k<256; k++ ) {
     
         path.clear();
         path.setFilled( false );
         
-        float rSat = ofRandom( 100, 200 );
-        float rAlpha = ofRandom( 50, 250 );
+        //float rSat = ofRandom( 100, 200 );
+        float rAlpha = ofRandom( 20, 255 );
         
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
             
-            float radius = ofMap( record.data.getVelocity(), 0, 1, 1, 5 ) + ofRandom( -2, 2 );
-            if( k == 0 ) radius = 0; if( radius == bpf->getSize()-1 ) radius = 0;
+            radius = ofMap( record.data.getVelocity(), 0, 1, 0, 5 ) + ofRandom( -2, 2 );
+            if( k == 0 ) radius = 0; if( k == bpf->getSize()-1 ) radius = 0;
             
-            float pitch = ofMap( record.data.getPitch(), 0, 1,
-            ofGetHeight(), 0 ) + ofRandom( -radius,radius );
+            pitch = ofMap( record.data.getPitch(), 0, 1,
+            ofGetHeight(), 0 ) + ofRandom( -radius, radius );
             
-            float time = ( screenMapper->getXfromTime( record.data.time ) -
-            screenMapper->getXfromTime( bpf->getMinTime() ) )
-            + ofRandom( -radius,radius );
+            time = ( screenMapper->getXfromTime( record.data.time ) -
+            screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
             
             if( k==0 ) path.moveTo( time, pitch );
             else path.curveTo( time, pitch );
         }
         
+        path.curveTo( time, pitch );
         //color.setHsb( rHue, rSat, 255, rAlpha );
         color.set( bpf->r, bpf->g, bpf->b, rAlpha );
         path.setColor( color ); path.draw();
@@ -61,14 +64,25 @@ void cOo::SketchedCurve::redrawFbo( void ) {
 
 void cOo::SketchedCurve::draw( void ) {
     
-    if( bpf->isActive() ) ofSetColor( 255, 255, 255, 255 );
-    else ofSetColor( 255, 255, 255, 100 ); // active = bigger alpha
+    float xMin = screenMapper->getXfromTime( bpf->getMinTime() );
+    float xMax = screenMapper->getXfromTime( bpf->getMaxTime() );
     
-    float min = screenMapper->getXfromTime( bpf->getMinTime() );
-    float max = screenMapper->getXfromTime( bpf->getMaxTime() );
+    if( xMin > ofGetWidth() || xMax < 0 ) {
     
-    if( ( min < ofGetWidth() || max > 0 ) && bpf->getSize() > 2 ) {
+        if( fbo != NULL ) { delete fbo; fbo = NULL; }
+        visible = false; // out of the window
         
-        fbo->draw( min, 0 );
+    } else {
+        
+        if( !visible ) { generate(); visible = true; }
+        
+        if( bpf->isActive() ) ofSetColor( 255, 255, 255, 255 );
+        else ofSetColor( 255, 255, 255, 180 ); // change alpha
+        fbo->draw( xMin, 0 ); // redraw only the first time
     }
+}
+
+bool cOo::SketchedCurve::isVisible( void ) {
+
+    return( visible );
 }

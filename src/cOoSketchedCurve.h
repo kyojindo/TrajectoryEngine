@@ -12,10 +12,12 @@ namespace cOo {
     
       public:
         
-        void set( BreakPointFunction *function, ScreenMapper *smap );
-        void redrawFbo( void ); void draw( void ); // ------------
+        void link( BreakPointFunction *function, ScreenMapper *smap );
+        void generate( void ); void draw( void ); bool isVisible( void );
         
-      protected:
+      //protected:
+        
+        bool visible;
         
         BreakPointFunction *bpf;
         ScreenMapper *screenMapper;
