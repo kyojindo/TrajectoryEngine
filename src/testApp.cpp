@@ -6,7 +6,7 @@ void testApp::setup( void ) {
     list<BreakPointFunction *>::iterator bpf;
     
     ofEnableAlphaBlending(); ofEnableSmoothing();
-    ofSetFrameRate( 120 ); ofBackground( 10, 10, 10 );
+    ofSetFrameRate( 120 ); ofBackground( 20, 20, 20 );
     
     timeline.load( 8*10, 32, 3.0f*60.0f ); // load the XML file with th score
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback

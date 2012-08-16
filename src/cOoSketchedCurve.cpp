@@ -13,7 +13,7 @@ void cOo::SketchedCurve::generate( void ) {
     Record record; ofPath path; ofColor color;
     
     fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() )
-    * screenMapper->getPixelPerSec() + 32.0f;
+    * screenMapper->getPixelPerSec() + 128.0f;
     fboHeight = ofGetHeight();
     
     if( fbo != NULL ) delete fbo; fbo = new ofFbo();
@@ -28,20 +28,20 @@ void cOo::SketchedCurve::generate( void ) {
     
     //float rHue = ofRandom( 0, 255 );
     
-    for( int k=0; k<256; k++ ) {
+    for( int k=0; k<50; k++ ) {
     
         path.clear();
         path.setFilled( false );
         
-        //float rSat = ofRandom( 100, 200 );
+        float rSat = ofRandom( 100, 200 );
         float rAlpha = ofRandom( 20, 255 );
         
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
             
-            radius = ofMap( record.data.getVelocity(), 0, 1, 0, 5 ) + ofRandom( -2, 2 );
-            if( k == 0 ) radius = 0; if( k == bpf->getSize()-1 ) radius = 0;
+            radius = ofMap( record.data.getVelocity(), 0, 1, 0, 2 ) + ofRandom( -5, 5 );
+            if( k == 0 ) radius = 0.5; if( k == bpf->getSize()-1 ) radius = 0.5;
             
             pitch = ofMap( record.data.getPitch(), 0, 1,
             ofGetHeight(), 0 ) + ofRandom( -radius, radius );
@@ -49,14 +49,17 @@ void cOo::SketchedCurve::generate( void ) {
             time = ( screenMapper->getXfromTime( record.data.time ) -
             screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
             
-            if( k==0 ) path.moveTo( time, pitch );
-            else path.curveTo( time, pitch );
+            if( k==0 ) path.moveTo( time+64, pitch );
+            else path.curveTo( time+64, pitch );
         }
         
-        path.curveTo( time, pitch );
+        path.curveTo( time+64, pitch );
         //color.setHsb( rHue, rSat, 255, rAlpha );
         color.set( bpf->r, bpf->g, bpf->b, rAlpha );
-        path.setColor( color ); path.draw();
+        color.setSaturation( rSat );
+        color.setBrightness( 255 );
+        path.setColor( color );
+        path.draw();
     }
     
     fbo->end();
@@ -77,8 +80,8 @@ void cOo::SketchedCurve::draw( void ) {
         if( !visible ) { generate(); visible = true; }
         
         if( bpf->isActive() ) ofSetColor( 255, 255, 255, 255 );
-        else ofSetColor( 255, 255, 255, 180 ); // change alpha
-        fbo->draw( xMin, 0 ); // redraw only the first time
+        else ofSetColor( 255, 255, 255, 150 ); // change alpha
+        fbo->draw( xMin-64, 0 ); // redraw only the first time
     }
 }
 
