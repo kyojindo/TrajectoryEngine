@@ -61,13 +61,11 @@ class testApp : public ofBaseApp {
     Time playbackTime; // playback head in seconds ( shared mem )
     bool playAsLoop; // flag to set if we play as loop or not
     
+    ofColor color; // just a color varaible to set hue
     double zoomFactor; // stored zoom factor on the score
-    bool isSliding; // flag to detect if the score slides
     bool fullScreen; // flag to redraw all the curves
     
     ofxOscReceiver oscReceiver; // OSC receiver
     ofxOscSender oscSender; // OSC sender
     ofxOscMessage message; // message
-    
-    long nOfAllocated;
 };

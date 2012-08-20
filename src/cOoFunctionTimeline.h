@@ -3,10 +3,13 @@
 
 #include <list>
 #include <vector>
+#include <math.h>
 
 #include "cOoBreakPointFunction.h"
 #include "ofxXmlSettings.h"
 #include "cOoVuzikXML.h"
+
+#include "ofMain.h"
 
 using namespace std;
 
@@ -22,6 +25,8 @@ namespace cOo {
         ~FunctionTimeline( void );
         
         void load( long tlSize, long bpfSize, Time maxTime );
+        
+        void generate( long nOfBpfs, long minBpfSize, long maxBpfSize, Time maxTime );
         
         void activateFrom( long fromIndex, Time &time );
         void deactivateFrom( long fromIndex, Time &time );

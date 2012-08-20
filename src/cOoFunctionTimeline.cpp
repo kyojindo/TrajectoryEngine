@@ -164,6 +164,52 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
     scoreMaxTime += 2.0f; // trick to add some room at the end
 }
 
+// --- fill the timeline with random curves ----
+void cOo::FunctionTimeline::generate( long nOfBpfs,
+long minBpfSize, long maxBpfSize, Time maxTime ) {
+
+    long id = 0;
+    DataSet dataSet;
+    
+    startList.resize( nOfBpfs );
+    stopList.resize( nOfBpfs );
+    scoreMaxTime = maxTime;
+    
+    for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
+        
+        (*t) = new BreakPointFunction();
+        
+        (*t)->setProperties( id, (long)round( ofRandom( 0, 3 ) ) );
+        
+        long bpfSize = round( ( (double)rand() / (double)RAND_MAX )*( maxBpfSize-minBpfSize ) + minBpfSize );
+        
+        dataSet.pitch = ( (double)rand() / (double)RAND_MAX )*( 25.0f-5.0f ) + 5.0f;
+        dataSet.time = ( (double)rand() / (double)RAND_MAX )*( maxTime-2.0f ) + 2.0f;
+        double angle = 0.0f; double radius = 1.0f; dataSet.velocity = 0.5f;
+        
+        for( long k=0; k<bpfSize; k++ ) {
+            
+            angle = ofRandom( -0.75f*PI, 0.75f*PI );
+            radius = ofRandom( 1.0f, 3.0f );
+            
+            dataSet.time += radius*cos( angle );
+            dataSet.pitch += radius*sin( angle );
+            
+            if( dataSet.time < 0 || dataSet.time > maxTime ) break;
+            else if( dataSet.pitch < 0.0f || dataSet.pitch > 33.0f ) break;
+            else (*t)->addDataSet( dataSet ); // fill or leave
+        }
+    }
+    
+    // sort startList by startTime order ( using overladed predicate )
+    startList.sort( cOo::BreakPointFunction::startTimeSortPredicate );
+    
+    stopList = startList; // copy and sort stopList by stopTime order
+    stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
+    
+    scoreMaxTime += 2.0f; // trick to add some room at the end
+}
+
 void cOo::FunctionTimeline::activateFrom( long fromIndex, Time &time ) {
     
     // no need to go here if end reached
@@ -263,6 +309,7 @@ void cOo::FunctionTimeline::getNextTouched( vector<Record> &touched, Time &time 
                 // we switch it back
                 touched[k].data = record.data;
                 touched[k].time = record.time;
+                touched[k].type = record.type;
                 touched[k].state = atAny;
                 found = true;
             }
@@ -311,6 +358,7 @@ void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
                 // update and switch back
                 touched[k].data = record.data;
                 touched[k].time = record.time;
+                touched[k].type = record.type;
                 touched[k].state = atAny;
                 found = true;
             }

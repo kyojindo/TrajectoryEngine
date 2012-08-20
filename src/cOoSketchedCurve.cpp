@@ -23,41 +23,38 @@ void cOo::SketchedCurve::generate( void ) {
     
     ofClear( 255, 255, 255, 0 );
     glEnable( GL_LINE_SMOOTH ); glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
     glHint( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
     
-    //float rHue = ofRandom( 0, 255 );
-    
-    for( int k=0; k<50; k++ ) {
+    for( int k=0; k<64; k++ ) {
     
         path.clear();
         path.setFilled( false );
+        path.setStrokeWidth( 2.0f );
         
-        float rSat = ofRandom( 100, 200 );
-        float rAlpha = ofRandom( 20, 255 );
+        float rSat = ofRandom( 150, 200 );
+        float rAlpha = ofRandom( 20, 240 );
         
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
             
-            radius = ofMap( record.data.getVelocity(), 0, 1, 0, 2 ) + ofRandom( -5, 5 );
-            if( k == 0 ) radius = 0.5; if( k == bpf->getSize()-1 ) radius = 0.5;
+            radius = ofMap( record.data.getVelocity(), 0, 1, 0, 6 ) + ofRandom( -8, 8 );
+            if( k == 0 ) radius = 0.1; if( k == bpf->getSize()-1 ) radius = 0.1;
             
-            pitch = ofMap( record.data.getPitch(), 0, 1,
+            pitch = ofMap( record.data.getPitch(), 0, 33,
             ofGetHeight(), 0 ) + ofRandom( -radius, radius );
             
             time = ( screenMapper->getXfromTime( record.data.time ) -
             screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
             
             if( k==0 ) path.moveTo( time+64, pitch );
+            if( k==1 ) path.lineTo( time+64, pitch );
             else path.curveTo( time+64, pitch );
         }
         
         path.curveTo( time+64, pitch );
-        //color.setHsb( rHue, rSat, 255, rAlpha );
-        color.set( bpf->r, bpf->g, bpf->b, rAlpha );
-        color.setSaturation( rSat );
-        color.setBrightness( 255 );
+        color.setHsb( ofMap( bpf->getType(), 0, 3, 0, 128 ), rSat, 255, rAlpha );
         path.setColor( color );
         path.draw();
     }

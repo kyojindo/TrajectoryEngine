@@ -6,10 +6,10 @@ void testApp::setup( void ) {
     list<BreakPointFunction *>::iterator bpf;
     
     ofEnableAlphaBlending(); ofEnableSmoothing();
-    ofSetFrameRate( 120 ); ofBackground( 20, 20, 20 );
+    ofSetFrameRate( 120 ); ofBackground( 10, 10, 10 );
     
-    timeline.load( 8*10, 32, 3.0f*60.0f ); // load the XML file with th score
-    timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
+    timeline.generate( 16, 10, 30, 60.0f ); // generate a given random score
+    timer.setup( 128, 0.005, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     
     // link each BPF to its FBO rendering object and give it a first full rendering
@@ -23,8 +23,7 @@ void testApp::setup( void ) {
     zoomTimeline( zoomFactor );
     
     fullScreen = false;
-    playAsLoop = true;
-    isSliding = false;
+    playAsLoop = false;
 }
 
 void testApp::exit( void ) {
@@ -34,13 +33,8 @@ void testApp::exit( void ) {
 
 void testApp::update( void ) {
     
-    nOfAllocated = 0;
-    list<SketchedCurve>::iterator skc;
-    
-    for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end(); skc++ ) {
-        
-        if( (*skc).fbo != NULL ) nOfAllocated++;
-    }
+    ofEnableAlphaBlending();
+    ofEnableSmoothing();
     
     ofxOscMessage m;
     
@@ -64,8 +58,26 @@ void testApp::draw( void ) {
     float tVal, xTouch, yTouch;
     list<SketchedCurve>::iterator skc;
     
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA,
+    GL_ONE_MINUS_CONSTANT_ALPHA );
+    
+    for( int k=0; k<33; k++ ) {
+    
+        ofSetColor( 255, 255, 255, 30 );
+        ofLine( 0, ofMap( k, 0, 32, 0, ofGetHeight() ),
+        ofGetWidth(), ofMap( k, 0, 32, 0, ofGetHeight() ) );
+    }
+    
     OSMemoryBarrier();
     dTouched = sTouched;
+    
+    playbackAccess.lock(); // get the head position
+    tVal = screenMapper.getXfromTime( playbackTime );
+    playbackAccess.unlock();
+    
+    ofSetColor( 255, 255, 255, 120 ); // line
+    ofLine( tVal, 0, tVal, ofGetHeight() );
     
     for( skc=sketchedCurve.begin();
     skc!=sketchedCurve.end(); skc++ ) {
@@ -73,44 +85,36 @@ void testApp::draw( void ) {
         (*skc).draw();
     }
     
-    playbackAccess.lock();
-    
-    // get the playback head position on the screen
-    tVal = screenMapper.getXfromTime( playbackTime );
-    isSliding = false; // tricky flag to cheat on position
-    
-    if( tVal > ofGetWidth()/2 && timeline.getMaxTime() >
-    screenMapper.getTimefromX( ofGetWidth() ) ) {
-        
-        screenMapper.incTimeOffset( -( playbackTime-
-        screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
-        isSliding = true; // shift to stay centered
-    }
-    
-    playbackAccess.unlock();
-    
-    ofSetColor( 200, 200, 200 ); // line
-    ofLine( tVal, 0, tVal, ofGetHeight() );
-    
     // draw circles for touched sets
     for( long k=0; k<dTouched.size(); k++ ) {
         
-        yTouch = ofMap( dTouched[k].data.getPitch(), 0, 1, ofGetHeight(), 0 );
+        yTouch = ofMap( dTouched[k].data.getPitch(), 0, 33, ofGetHeight(), 0 );
         xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
         
-        if( isSliding ) xTouch += 4; // trick to avoid circles to be behind
+        color.setHue( ofMap( dTouched[k].type, 0, 3, 0, 128 ) );
+        color.setBrightness( 255 ); color.setSaturation( 200 );
         
-        ofNoFill(); ofSetColor( 250, 250, 250, 220 );
-        ofCircle( xTouch, yTouch, 6 );
+        ofNoFill();
+        ofSetColor( color, 200 );
+        ofCircle( xTouch, yTouch, 13 );
+        ofCircle( xTouch, yTouch, 14 );
+        ofCircle( xTouch, yTouch, 15 );
     }
     
-    ofSetColor( 200, 200, 200 ); // draw playback time
-    
     playbackAccess.lock();
+    ofSetColor( 200, 200, 200 ); // draw playback time
     ofDrawBitmapString( ofToString( playbackTime ), 20, 30 );
     playbackAccess.unlock();
     
-    ofDrawBitmapString( ofToString( nOfAllocated ), 20, 60 );
+    // manage the shifting of the screen ~ playback
+    if( tVal > ofGetWidth()/2 && timeline.getMaxTime() >
+       screenMapper.getTimefromX( ofGetWidth() ) ) {
+        
+        playbackAccess.lock();
+        screenMapper.incTimeOffset( -( playbackTime-
+        screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
+        playbackAccess.unlock();
+    }
 }
 
 void testApp::movePlaybackTime( Time time ) {
@@ -136,7 +140,7 @@ void testApp::zoomTimeline( double factor ) {
     if( factor < 0.000001f ) factor = 0.000001f;
     
     float pOffset = screenMapper.getXfromTime( playbackTime );
-    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 10.0f ) );
+    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 20.0f ) );
     double newPbt = screenMapper.getTimefromX( pOffset );
     screenMapper.incTimeOffset( newPbt-playbackTime );
     
@@ -181,6 +185,9 @@ void testApp::keyPressed( int key ) {
         
         fullScreen = !fullScreen;
         ofSetFullscreen( fullScreen );
+        
+        if( fullScreen ) ofHideCursor();
+        else ofShowCursor();
     }
 
     if( key == '+' ) { zoomFactor+=0.1; zoomTimeline( zoomFactor ); }
