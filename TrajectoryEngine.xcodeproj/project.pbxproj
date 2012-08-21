@@ -26,7 +26,6 @@
 		9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */; };
 		9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
-		D59B777815D9AACD00DFBF18 /* cOoVuzikXML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -126,8 +125,6 @@
 		9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoScreenMapper.cpp; sourceTree = "<group>"; };
 		9FC5BC3915DA5D930076638F /* cOoScreenMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoScreenMapper.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
-		D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoVuzikXML.h; sourceTree = "<group>"; };
-		D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoVuzikXML.cpp; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
@@ -314,18 +311,8 @@
 				9F1E5F1D15D269BC00194F56 /* FunctionTimeline */,
 				9F1E5F1E15D269DC00194F56 /* AudioTimer */,
 				9FC5BC3315DA552B0076638F /* Rendering */,
-				9FC1F84515DA73A400D91E9F /* Import */,
 			);
 			name = TrajectoryEngine;
-			sourceTree = "<group>";
-		};
-		9FC1F84515DA73A400D91E9F /* Import */ = {
-			isa = PBXGroup;
-			children = (
-				D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */,
-				D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */,
-			);
-			name = Import;
 			sourceTree = "<group>";
 		};
 		9FC5BC3315DA552B0076638F /* Rendering */ = {
@@ -569,7 +556,6 @@
 				F7A4B98F15D5D3450061BF3E /* tinyxmlerror.cpp in Sources */,
 				F7A4B99015D5D3450061BF3E /* tinyxmlparser.cpp in Sources */,
 				F7A4B99115D5D3450061BF3E /* ofxXmlSettings.cpp in Sources */,
-				D59B777815D9AACD00DFBF18 /* cOoVuzikXML.cpp in Sources */,
 				9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */,
 				9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */,
 				9FA2638115E3C123000780E2 /* cOoColorMap.cpp in Sources */,

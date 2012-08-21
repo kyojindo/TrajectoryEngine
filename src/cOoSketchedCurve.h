@@ -1,10 +1,9 @@
 #ifndef __cOoSketchedCurve__
 #define __cOoSketchedCurve__
 
-#include "cOoScreenMapper.h"
 #include "cOoBreakPointFunction.h"
+#include "cOoScreenMapper.h"
 #include "cOoColorMap.h"
-
 #include "ofMain.h"
 
 namespace cOo {

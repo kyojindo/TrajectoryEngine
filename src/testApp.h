@@ -15,6 +15,7 @@
 using namespace cOo;
 
 const int nOfSemitones = 33;
+const float scoreDuration = 180.0f;
 
 class testApp : public ofBaseApp {
     
@@ -49,6 +50,7 @@ class testApp : public ofBaseApp {
     
   protected:
     
+    void generateNewScore( void ); // routine to generate a total new score
     static void playbackTimeInc( void *usrPtr ); // increment the pb head position
     void sendTouchedAsOscMessages( void ); // send OSC messages for touched sets
     void regenerateVisibleCurves( void ); // regenerate visible FBO curves
@@ -58,6 +60,7 @@ class testApp : public ofBaseApp {
     
     ScreenMapper screenMapper; // time/screen mapping object
     list<SketchedCurve> sketchedCurve; // curve rendering obj
+    ofMutex sketchedCurveAccess; // mutex for regeneration
     
     AudioTimer timer; // audio-based timer with callback registration
     ofMutex playbackAccess; // mutex for accessing the playback head

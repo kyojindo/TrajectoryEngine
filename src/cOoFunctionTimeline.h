@@ -34,9 +34,8 @@ namespace cOo {
         FunctionTimeline( void );
         ~FunctionTimeline( void );
         
-        void load( long tlSize, long bpfSize, Time maxTime );
-        
         void generate( Time maxTime );
+        void clear( void );
         
         void activateFrom( long fromIndex, Time &time );
         void deactivateFrom( long fromIndex, Time &time );

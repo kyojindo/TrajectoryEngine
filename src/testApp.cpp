@@ -2,18 +2,12 @@
 
 void testApp::setup( void ) {
     
-    list<SketchedCurve>::iterator skc;
-    list<BreakPointFunction *>::iterator bpf;
-    
     ofEnableAlphaBlending(); ofEnableSmoothing();
     ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
     
-    timeline.generate( 180.0f ); // generate a random score of given time
-    timer.setup( 128, 0.005, &playbackTimeInc, this ); // register the callback
-    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
+    timer.setup( 128, 0.005, &playbackTimeInc, this ); // timer setup
     
-    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
-    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
+    generateNewScore(); // generate a whole new score in the timeline
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
@@ -22,7 +16,7 @@ void testApp::setup( void ) {
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     fullScreen = false;
-    playAsLoop = false;
+    playAsLoop = true;
 }
 
 void testApp::exit( void ) {
@@ -85,8 +79,10 @@ void testApp::draw( void ) {
     ofSetColor( 255, 255, 255, 100 ); ofSetLineWidth( 2 );
     ofLine( tVal, 0, tVal, ofGetHeight() );
     
+    sketchedCurveAccess.lock();
     for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end();
     skc++ ) (*skc).draw(); // we draw the FBO-based curves
+    sketchedCurveAccess.unlock();
     
     // draw circles for touched data sets
     for( long k=0; k<dTouched.size(); k++ ) {
@@ -265,6 +261,20 @@ void testApp::sendTouchedAsOscMessages( void ) {
     }
 }
 
+void testApp::generateNewScore( void ) {
+    
+    list<SketchedCurve>::iterator skc;
+    list<BreakPointFunction *>::iterator bpf;
+    
+    timeline.clear(); sketchedCurve.clear(); // clear everything
+    
+    timeline.generate( scoreDuration ); // generate a random score
+    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
+    
+    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
+    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
+}
+
 void testApp::playbackTimeInc( void *usrPtr ) {
     
     testApp *app = (testApp *)usrPtr;
@@ -279,6 +289,10 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         
         app->movePlaybackTime( 0.0f );
         app->screenMapper.setTimeOffset( 0.0f );
+        
+        app->sketchedCurveAccess.lock();
+        app->generateNewScore();
+        app->sketchedCurveAccess.unlock();
         
     } else {
     
