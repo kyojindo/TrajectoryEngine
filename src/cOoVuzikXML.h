@@ -2,13 +2,18 @@
 #define __TrajectoryEngine__cOoVuzikXML__
 
 #include <iostream>
+#include "ofMain.h"
 
 using namespace std;
 
 namespace cOo {
-
     
     class VuzikXML {
+        
+        enum vuzikColor {
+            SOP, ALT, TEN, BAS
+        };
+        
         
     public:
         void init(long size, double line_w, int A, int R, int G, int B);
@@ -24,10 +29,14 @@ namespace cOo {
         
         long getSize() {return numPts;}
         
+        
         int alpha;
         int red;
         int green;
         int blue;
+        
+        //we can find what voice it is based on red color alone
+        static int parseVuzikLineType(int r);
         
     private:
         

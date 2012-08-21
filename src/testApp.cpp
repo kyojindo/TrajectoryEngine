@@ -8,7 +8,8 @@ void testApp::setup( void ) {
     ofEnableAlphaBlending(); ofEnableSmoothing();
     ofSetFrameRate( 120 ); ofBackground( 10, 10, 10 );
     
-    timeline.generate( 16, 10, 30, 60.0f ); // generate a given random score
+    //timeline.generate( 16, 10, 30, 60.0f ); // generate a given random score
+    timeline.load(16, 10, 30);
     timer.setup( 128, 0.005, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     

@@ -99,13 +99,14 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         printf("x_min x_max: %f %f\n", x_min, x_max);
         printf("y_min y_max: %f %f\n", y_min, y_max);
         
-        pitch_in_min = y_min;
-        pitch_in_max = y_max;
+        pitch_in_min = 16;
+        pitch_in_max = 1048;
         pitch_out_min = 0.0;
-        pitch_out_max = 1.0;
+        pitch_out_max = 33.0;
         
         x_in_min = x_min;
         x_in_max = x_max;
+        maxTime = x_max/100.0;
     }
     
     startList.resize( numLines );
@@ -124,14 +125,17 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         // Vuzik XML file should be parsed, a arbitrary time base defined, and
         // the data sets added as to respect the ordering of the painting
         // which is probably the ordering in the XML file anyway
-        
-        // set the BPF properties
-        (*t)->setProperties( id, 0 );
-        
+                
         (*t)->a = vuzikLines[id-1].alpha;
         (*t)->r = vuzikLines[id-1].red;
         (*t)->g = vuzikLines[id-1].green;
         (*t)->b = vuzikLines[id-1].blue;
+        
+        int lineType =VuzikXML::parseVuzikLineType(vuzikLines[id-1].red);
+        
+        // set the BPF properties
+        (*t)->setProperties( id, lineType);
+
         
         bpfSize = vuzikLines[id-1].getSize();
         
@@ -139,8 +143,8 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         
         dataSet.velocity = (double)rand() / (double)RAND_MAX;
         
-        // and start from a random time in virtual time ( earliest = 0.5 from start )
-        dataSet.time = vuzikLines[id-1].getX(0)*maxTime/(x_in_max-x_in_min);
+        
+        dataSet.time = 0.5+(vuzikLines[id-1].getX(0)-x_in_min)*maxTime/(x_in_max-x_in_min);
         
         for( long k=0; k<bpfSize; k++ ) {
         
@@ -149,7 +153,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
             dataSet.velocity += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
             
-            dataSet.time = vuzikLines[id-1].getX(k)*maxTime/(x_in_max-x_in_min);
+            dataSet.time = 0.5+(vuzikLines[id-1].getX(k)-x_in_min)*maxTime/(x_in_max-x_in_min);
             
         }
     }
