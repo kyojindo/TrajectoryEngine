@@ -22,6 +22,7 @@
 		9F717B4215D164D2004EAAAA /* cOoBreakPointFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F717B3B15D164D2004EAAAA /* cOoBreakPointFunction.cpp */; };
 		9F717B4315D164D2004EAAAA /* cOoDataSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F717B3D15D164D2004EAAAA /* cOoDataSet.cpp */; };
 		9F717B4415D164D2004EAAAA /* cOoFunctionTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F717B3F15D164D2004EAAAA /* cOoFunctionTimeline.cpp */; };
+		9FA2638115E3C123000780E2 /* cOoColorMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FA2638015E3C123000780E2 /* cOoColorMap.cpp */; };
 		9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */; };
 		9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
@@ -118,6 +119,8 @@
 		9F717B3F15D164D2004EAAAA /* cOoFunctionTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoFunctionTimeline.cpp; sourceTree = "<group>"; };
 		9F717B4015D164D2004EAAAA /* cOoFunctionTimeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoFunctionTimeline.h; sourceTree = "<group>"; };
 		9F717B4115D164D2004EAAAA /* cOoRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoRecord.h; sourceTree = "<group>"; };
+		9FA2637D15E3BEA0000780E2 /* cOoColorMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cOoColorMap.h; sourceTree = "<group>"; };
+		9FA2638015E3C123000780E2 /* cOoColorMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoColorMap.cpp; sourceTree = "<group>"; };
 		9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoSketchedCurve.cpp; sourceTree = "<group>"; };
 		9FC5BC3615DA56400076638F /* cOoSketchedCurve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoSketchedCurve.h; sourceTree = "<group>"; };
 		9FC5BC3815DA5D930076638F /* cOoScreenMapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoScreenMapper.cpp; sourceTree = "<group>"; };
@@ -332,6 +335,8 @@
 				9FC5BC3915DA5D930076638F /* cOoScreenMapper.h */,
 				9FC5BC3515DA56400076638F /* cOoSketchedCurve.cpp */,
 				9FC5BC3615DA56400076638F /* cOoSketchedCurve.h */,
+				9FA2638015E3C123000780E2 /* cOoColorMap.cpp */,
+				9FA2637D15E3BEA0000780E2 /* cOoColorMap.h */,
 			);
 			name = Rendering;
 			sourceTree = "<group>";
@@ -567,6 +572,7 @@
 				D59B777815D9AACD00DFBF18 /* cOoVuzikXML.cpp in Sources */,
 				9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */,
 				9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */,
+				9FA2638115E3C123000780E2 /* cOoColorMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,7 +591,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/bin/";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
@@ -605,6 +612,7 @@
 					"$(OF_CORE_HEADERS)",
 					src,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
@@ -617,7 +625,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/bin/";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -638,6 +647,7 @@
 					"$(OF_CORE_HEADERS)",
 					src,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
@@ -729,7 +739,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = TrajectoryEngine;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.6;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -816,7 +826,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = TrajectoryEngine;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.6;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

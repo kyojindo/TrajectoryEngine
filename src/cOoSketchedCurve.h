@@ -3,6 +3,7 @@
 
 #include "cOoScreenMapper.h"
 #include "cOoBreakPointFunction.h"
+#include "cOoColorMap.h"
 
 #include "ofMain.h"
 
@@ -15,12 +16,14 @@ namespace cOo {
         void link( BreakPointFunction *function, ScreenMapper *smap );
         void generate( void ); void draw( void ); bool isVisible( void );
         
-      //protected:
+      protected:
         
         bool visible;
         
         BreakPointFunction *bpf;
         ScreenMapper *screenMapper;
+        
+        ColorMap colorMap;
         
         float fboWidth;
         float fboHeight;

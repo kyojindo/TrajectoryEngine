@@ -6,22 +6,20 @@ void testApp::setup( void ) {
     list<BreakPointFunction *>::iterator bpf;
     
     ofEnableAlphaBlending(); ofEnableSmoothing();
-    ofSetFrameRate( 120 ); ofBackground( 10, 10, 10 );
+    ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
     
-    //timeline.generate( 16, 10, 30, 60.0f ); // generate a given random score
-    timeline.load(16, 10, 30);
+    timeline.generate( 180.0f ); // generate a random score of given time
     timer.setup( 128, 0.005, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     
-    // link each BPF to its FBO rendering object and give it a first full rendering
     for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
-    bpf++, skc++ ) { (*skc).link( (*bpf), &screenMapper ); } // -------------------
+    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
-    oscReceiver.setup( 8000 ); // receive OSC on port 8000
+    oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
     
-    zoomFactor = 1.0f; // zoom
-    zoomTimeline( zoomFactor );
+    zoomFactor = 1.0f; // set zoom factor to default
+    zoomTimeline( zoomFactor ); // and apply the zoom
     
     fullScreen = false;
     playAsLoop = false;
@@ -29,13 +27,11 @@ void testApp::setup( void ) {
 
 void testApp::exit( void ) {
     
+    // pause timer before quiting
     if( isPlaying() ) pausePlayback();
 }
 
 void testApp::update( void ) {
-    
-    ofEnableAlphaBlending();
-    ofEnableSmoothing();
     
     ofxOscMessage m;
     
@@ -43,12 +39,11 @@ void testApp::update( void ) {
         
         oscReceiver.getNextMessage( &m );
         
-        if( m.getAddress() == "/play" ) startPlayback();
-        if( m.getAddress() == "/pause" ) pausePlayback();
-        if( m.getAddress() == "/stop" ) stopPlayback();
+        if( m.getAddress() == "/play" ) startPlayback(); // start/resume the playback
+        if( m.getAddress() == "/pause" ) pausePlayback(); // pause the playback at location
+        if( m.getAddress() == "/stop" ) stopPlayback(); // stop the playback and reset
         
         if( m.getAddress() == "/move" ) movePlaybackTime( (Time)m.getArgAsFloat( 0 ) );
-        
         if( m.getAddress() == "/zoom" ) zoomTimeline( (double)m.getArgAsFloat( 0 ) );
         if( m.getAddress() == "/shift" ) moveTimeline( (Time)m.getArgAsFloat( 0 ) );
     }
@@ -56,50 +51,59 @@ void testApp::update( void ) {
 
 void testApp::draw( void ) {
     
-    float tVal, xTouch, yTouch;
     list<SketchedCurve>::iterator skc;
     
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA,
-    GL_ONE_MINUS_CONSTANT_ALPHA );
+    glEnable( GL_BLEND ); // GL options are resent at draw
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
     
-    for( int k=0; k<33; k++ ) {
+    for( int k=0; k<nOfSemitones; k++ ) {
     
-        ofSetColor( 255, 255, 255, 30 );
-        ofLine( 0, ofMap( k, 0, 32, 0, ofGetHeight() ),
-        ofGetWidth(), ofMap( k, 0, 32, 0, ofGetHeight() ) );
+        // [TODO] replace this by a screenMapper-based call and stuff
+        float semiLoc = ofMap( k, 0, nOfSemitones, 0, ofGetHeight() );
+        ofSetColor( 255, 255, 255, 30 ); ofSetLineWidth( 2 );
+        ofLine( 0, semiLoc, ofGetWidth(), semiLoc );
     }
     
-    OSMemoryBarrier();
-    dTouched = sTouched;
+    Time secVal = 0.0f;
+    float secLoc = 0.0f;
     
-    playbackAccess.lock(); // get the head position
-    tVal = screenMapper.getXfromTime( playbackTime );
-    playbackAccess.unlock();
+    while( secLoc < ofGetWidth() ) {
     
-    ofSetColor( 255, 255, 255, 120 ); // line
+        secLoc = screenMapper.getXfromTime( secVal );
+        secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 10 );
+        ofSetLineWidth( 2 ); ofLine( secLoc, 0, secLoc, ofGetHeight() );
+    }
+    
+    // memory-protected exchange of data
+    OSMemoryBarrier(); dTouched = sTouched;
+    
+    playbackAccess.lock(); // playback time is locked
+    float tVal = screenMapper.getXfromTime( playbackTime );
+    playbackAccess.unlock(); // and used to update
+    
+    // we draw the line following the playback time
+    ofSetColor( 255, 255, 255, 100 ); ofSetLineWidth( 2 );
     ofLine( tVal, 0, tVal, ofGetHeight() );
     
-    for( skc=sketchedCurve.begin();
-    skc!=sketchedCurve.end(); skc++ ) {
+    for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end();
+    skc++ ) (*skc).draw(); // we draw the FBO-based curves
     
-        (*skc).draw();
-    }
-    
-    // draw circles for touched sets
+    // draw circles for touched data sets
     for( long k=0; k<dTouched.size(); k++ ) {
         
-        yTouch = ofMap( dTouched[k].data.getPitch(), 0, 33, ofGetHeight(), 0 );
-        xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
+        float yTouch = ofMap( dTouched[k].data.getPitch(), 0, 33, ofGetHeight(), 0 );
+        float xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
         
-        color.setHue( ofMap( dTouched[k].type, 0, 3, 0, 128 ) );
-        color.setBrightness( 255 ); color.setSaturation( 200 );
+        color.setHue( colorMap.get( dTouched[k].type ) ); ofNoFill();
         
-        ofNoFill();
-        ofSetColor( color, 200 );
-        ofCircle( xTouch, yTouch, 13 );
-        ofCircle( xTouch, yTouch, 14 );
-        ofCircle( xTouch, yTouch, 15 );
+        color.setBrightness( 100 ); color.setSaturation( 140 );
+        ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 13 );
+        
+        color.setBrightness( 220 ); color.setSaturation( 220 );
+        ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 14 );
+        
+        color.setBrightness( 150 ); color.setSaturation( 180 );
+        ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 15 );
     }
     
     playbackAccess.lock();
@@ -201,7 +205,7 @@ void testApp::keyPressed( int key ) {
 
 void testApp::keyReleased( int key ){
     
-    if( key == 'f' ) regenerateVisibleCurves();
+    if( key == 'f' ) { usleep( 5000 ); regenerateVisibleCurves(); }
 }
 
 void testApp::mousePressed( int x, int y, int button ) {
@@ -251,6 +255,10 @@ void testApp::sendTouchedAsOscMessages( void ) {
         
         message.addFloatArg( tTouched[k].data.getPitch() );
         message.addFloatArg( tTouched[k].data.getVelocity() );
+        
+        if( tTouched[k].craziness ) message.addIntArg( 1 );
+        else message.addIntArg( 0 ); // convert craziness
+        
         message.addIntArg( tTouched[k].state );
         
         oscSender.sendMessage( message );

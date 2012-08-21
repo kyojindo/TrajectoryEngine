@@ -15,7 +15,17 @@ using namespace std;
 
 namespace cOo {
     
+    enum {
+        
+        Silence,
+        Notes,
+        Curves,
+        Noise
+    };
+    
     const long EndOfList = -1;
+    
+    const int nOfVoices = 6;
     
     class FunctionTimeline {
     
@@ -26,7 +36,7 @@ namespace cOo {
         
         void load( long tlSize, long bpfSize, Time maxTime );
         
-        void generate( long nOfBpfs, long minBpfSize, long maxBpfSize, Time maxTime );
+        void generate( Time maxTime );
         
         void activateFrom( long fromIndex, Time &time );
         void deactivateFrom( long fromIndex, Time &time );

@@ -125,7 +125,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         // Vuzik XML file should be parsed, a arbitrary time base defined, and
         // the data sets added as to respect the ordering of the painting
         // which is probably the ordering in the XML file anyway
-                
+
         (*t)->a = vuzikLines[id-1].alpha;
         (*t)->r = vuzikLines[id-1].red;
         (*t)->g = vuzikLines[id-1].green;
@@ -169,40 +169,138 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
 }
 
 // --- fill the timeline with random curves ----
-void cOo::FunctionTimeline::generate( long nOfBpfs,
-long minBpfSize, long maxBpfSize, Time maxTime ) {
-
-    long id = 0;
-    DataSet dataSet;
+void cOo::FunctionTimeline::generate( Time maxTime ) {
     
-    startList.resize( nOfBpfs );
-    stopList.resize( nOfBpfs );
+    long id = 0;
+    int genType;
+    
+    Time currentTime;
+    Time deltaTime;
+    
+    DataSet dataSet;
+    long bpfSize;
+    
+    float minBound, vMinBound;
+    float maxBound, vMaxBound;
+    float angle, radius;
+    float genDistrib;
+    
     scoreMaxTime = maxTime;
     
-    for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
+    for( int v=0; v<nOfVoices; v++ ) {
+    
+        currentTime = ofRandom( 2.0f, 5.0f );
         
-        (*t) = new BreakPointFunction();
-        
-        (*t)->setProperties( id, (long)round( ofRandom( 0, 3 ) ) );
-        
-        long bpfSize = round( ( (double)rand() / (double)RAND_MAX )*( maxBpfSize-minBpfSize ) + minBpfSize );
-        
-        dataSet.pitch = ( (double)rand() / (double)RAND_MAX )*( 25.0f-5.0f ) + 5.0f;
-        dataSet.time = ( (double)rand() / (double)RAND_MAX )*( maxTime-2.0f ) + 2.0f;
-        double angle = 0.0f; double radius = 1.0f; dataSet.velocity = 0.5f;
-        
-        for( long k=0; k<bpfSize; k++ ) {
+        while( currentTime < scoreMaxTime ) {
             
-            angle = ofRandom( -0.75f*PI, 0.75f*PI );
-            radius = ofRandom( 1.0f, 3.0f );
+            genDistrib = ofRandom( 0.0f, 100.0f );
             
-            dataSet.time += radius*cos( angle );
-            dataSet.pitch += radius*sin( angle );
+            if( genDistrib > 0.0f && genDistrib <= 20.0f ) genType = Curves;
+            if( genDistrib > 20.0f && genDistrib <= 70.0f ) genType = Notes;
+            if( genDistrib > 70.0f && genDistrib <= 95.0f ) genType = Silence;
+            if( genDistrib > 95.0f && genDistrib <= 100.0f ) genType = Noise;
             
-            if( dataSet.time < 0 || dataSet.time > maxTime ) break;
-            else if( dataSet.pitch < 0.0f || dataSet.pitch > 33.0f ) break;
-            else (*t)->addDataSet( dataSet ); // fill or leave
+            deltaTime = ofRandom( 4.0f, 25.0f );
+            
+            switch( genType ) {
+                    
+                case Notes:
+                    
+                    id++; startList.resize( id ); stopList.resize( id );
+                    t=startList.begin(); for( long k=0; k<(id-1); k++ ) t++;
+                    bpfSize = (long)deltaTime; dataSet.time = currentTime;
+                    
+                    minBound = ofRandom( 3.0f, 16.0f ); maxBound = ofRandom( 17.0f, 30.0f );
+                    vMinBound = minBound + (float)v * ( (maxBound-minBound)/((float)(nOfVoices+1)) );
+                    vMaxBound = minBound + (float)(v+2) * ( (maxBound-minBound)/((float)(nOfVoices+1)) );
+                    
+                    dataSet.pitch = round( ofRandom( vMinBound, vMaxBound ) );
+                    dataSet.velocity = ofRandom( 0.2f, 1.0f );
+                    
+                    (*t) = new BreakPointFunction();
+                    (*t)->setProperties( id, v, false );
+                    
+                    for( long k=0; k<bpfSize; k++ ) {
+                        
+                        if( dataSet.time > ( maxTime - 2.0f ) || dataSet.pitch < 1.0f ||
+                        dataSet.pitch > 32.0f ) break; else (*t)->addDataSet( dataSet );
+                        
+                        dataSet.time += 1.0f;
+                    }
+                    
+                    break;
+                    
+                case Curves:
+                    
+                    id++; startList.resize( id ); stopList.resize( id );
+                    t=startList.begin(); for( long k=0; k<(id-1); k++ ) t++;
+                    bpfSize = (long)deltaTime; dataSet.time = currentTime;
+                    
+                    minBound = ofRandom( 7.0f, 16.0f ); maxBound = ofRandom( 17.0f, 26.0f );
+                    vMinBound = minBound + (float)v * ( (maxBound-minBound)/((float)(nOfVoices+1)) );
+                    vMaxBound = minBound + (float)(v+2) * ( (maxBound-minBound)/((float)(nOfVoices+1)) );
+                    
+                    (*t) = new BreakPointFunction();
+                    (*t)->setProperties( id, v, false );
+                    
+                    dataSet.pitch = round( ofRandom( vMinBound, vMaxBound ) );
+                    dataSet.velocity = ofRandom( 0.2f, 1.0f );
+                    
+                    for( long k=0; k<bpfSize; k++ ) {
+                    
+                        angle = ofRandom( -0.75f*PI, 0.75f*PI );
+                        radius = ofRandom( 1.0f, 3.0f );
+                        
+                        dataSet.time += radius*cos( angle );
+                        dataSet.pitch += radius*sin( angle );
+                        
+                        if( dataSet.time < 0 || dataSet.time > maxTime ||
+                        dataSet.pitch < 0.0f || dataSet.pitch > 33.0f ) break;
+                        else (*t)->addDataSet( dataSet ); // fill or leave
+                    }
+                    
+                    break;
+                    
+                case Noise:
+                    
+                    id++; startList.resize( id ); stopList.resize( id );
+                    t=startList.begin(); for( long k=0; k<(id-1); k++ ) t++;
+                    bpfSize = (long)deltaTime; dataSet.time = currentTime;
+                    
+                    minBound = ofRandom( 2.0f, 16.0f ); maxBound = ofRandom( 17.0f, 29.0f );
+                    vMinBound = minBound + (float)v * ( (maxBound-minBound)/((float)(nOfVoices+1)) );
+                    vMaxBound = minBound + (float)(v+2) * ( (maxBound-minBound)/((float)(nOfVoices+1)) );
+                    
+                    (*t) = new BreakPointFunction();
+                    (*t)->setProperties( id, v, true );
+                    
+                    dataSet.pitch = round( ofRandom( vMinBound, vMaxBound ) );
+                    dataSet.velocity = ofRandom( 0.2f, 1.0f );
+                    
+                    for( long k=0; k<bpfSize; k++ ) {
+                        
+                        angle = ofRandom( -0.75f*PI, 0.75f*PI );
+                        radius = ofRandom( 1.0f, 3.0f );
+                        
+                        dataSet.time += radius*cos( angle );
+                        dataSet.pitch += radius*sin( angle );
+                        
+                        if( dataSet.time < 0 || dataSet.time > maxTime ||
+                           dataSet.pitch < 0.0f || dataSet.pitch > 33.0f ) break;
+                        else (*t)->addDataSet( dataSet ); // fill or leave
+                    }
+                    
+                    break;
+            }
+            
+            currentTime += deltaTime;
         }
+    }
+    
+    for( t=startList.begin(); t!=startList.end(); t++ ) {
+        
+        // if the BPF is too small, we remove it from the timeline ---
+        if( (*t)->getSize() < 3 ) { delete (*t); startList.erase( t ); }
     }
     
     // sort startList by startTime order ( using overladed predicate )
@@ -302,7 +400,7 @@ void cOo::FunctionTimeline::getNextTouched( vector<Record> &touched, Time &time 
         
         (*t)->getNextDataSet( time, record.data );
         record.type = (*t)->getType(); record.id = (*t)->getId();
-        record.time = time; // create record from touched list
+        record.craziness = (*t)->isCrazy(); record.time = time;
         
         // we check in the cleaned touch list
         for( long k=0; k<touched.size(); k++ ) {
@@ -351,7 +449,7 @@ void cOo::FunctionTimeline::getTouched( vector<Record> &touched, Time &time ) {
         
         (*t)->getDataSet( time, record.data );
         record.type = (*t)->getType(); record.id = (*t)->getId();
-        record.time = time; // create record from touched list
+        record.craziness = (*t)->isCrazy(); record.time = time;
         
         // we check in the cleaned touch list
         for( long k=0; k<touched.size(); k++ ) {
@@ -415,5 +513,10 @@ void cOo::FunctionTimeline::print( void ) {
 }
 
 double cOo::FunctionTimeline::tempPitchConverter(double in_p) {
+<<<<<<< HEAD
     return VUZIK_PITCH_MIN + (VUZIK_Y_MAX-in_p)*(VUZIK_PITCH_MAX-VUZIK_PITCH_MIN)/(VUZIK_Y_MAX-VUZIK_Y_MIN);
+=======
+    
+    return pitch_out_min+ (pitch_in_max-in_p)*(pitch_out_max-pitch_out_min)/(pitch_in_max-pitch_in_min);
+>>>>>>> Finalized the rendering.
 }

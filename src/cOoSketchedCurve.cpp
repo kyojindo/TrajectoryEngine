@@ -38,8 +38,10 @@ void cOo::SketchedCurve::generate( void ) {
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
+
+            if( !bpf->isCrazy() ) radius = ofMap( record.data.getVelocity(), 0, 1, 0, 5 ) + ofRandom( -8, 8 );
+            else radius = ofMap( record.data.getVelocity(), 0, 1, 0, 10 ) + ofRandom( -60, 60 );
             
-            radius = ofMap( record.data.getVelocity(), 0, 1, 0, 2 ) + ofRandom( -2, 2 );
             if( k == 0 ) radius = 0.1; if( k == bpf->getSize()-1 ) radius = 0.1;
             
             pitch = ofMap( record.data.getPitch(), 0, 33,
@@ -49,13 +51,13 @@ void cOo::SketchedCurve::generate( void ) {
             screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
             
             if( k==0 ) path.moveTo( time+64, pitch );
-            if( k==1 ) path.lineTo( time+64, pitch );
             else path.curveTo( time+64, pitch );
         }
         
         path.curveTo( time+64, pitch );
-        //color.setHsb( ofMap( bpf->getType(), 0, 3, 0, 128 ), rSat, 255, rAlpha );
-        color.set(bpf->r, bpf->g, bpf->b);
+        
+        color.setHsb( colorMap.get( bpf->getType() ), rSat, 255, rAlpha );
+
         path.setColor( color );
         path.draw();
     }

@@ -24,7 +24,7 @@ namespace cOo {
         BreakPointFunction( void );
         
         // to fill the BPF with data sets and properties
-        void setProperties( long bpfId, long bpfType  );
+        void setProperties( long bpfId, long bpfType, bool bpfCraz );
         void addDataSet( DataSet &dataSet );
         
         // static functions defined to help any BPF to be sorted both by ascending start and stop times
@@ -52,6 +52,8 @@ namespace cOo {
         long getSize( void );
         long getId( void );
         
+        bool isCrazy( void );
+        
         void print( void );
         
         int a;
@@ -64,6 +66,7 @@ namespace cOo {
         list<Record> record;        
         bool active; long head;
         long type; long id;
+        bool craziness;
     };
 }
 

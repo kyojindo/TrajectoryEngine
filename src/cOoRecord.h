@@ -23,7 +23,7 @@ namespace cOo {
         
         Time time;
         DataSet data;
-                
+        bool craziness;
         State state;
         long type;
         long id;

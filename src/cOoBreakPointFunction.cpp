@@ -4,12 +4,13 @@ cOo::BreakPointFunction::BreakPointFunction( void ) {
     
     active = false;
     id = 0; type = 0;
+    craziness = false;
     head = 0;
 }
 
-void cOo::BreakPointFunction::setProperties( long bpfId, long bpfType  ) {
+void cOo::BreakPointFunction::setProperties( long bpfId, long bpfType, bool bpfCraz  ) {
 
-    id = bpfId; type = bpfType;
+    id = bpfId; type = bpfType; craziness = bpfCraz;
 }
 
 void cOo::BreakPointFunction::addDataSet( DataSet &dataSet ) {
@@ -171,6 +172,11 @@ long cOo::BreakPointFunction::getSize( void ) {
 long cOo::BreakPointFunction::getId( void ) {
     
     return( id );
+}
+
+bool cOo::BreakPointFunction::isCrazy( void ) {
+
+    return( craziness );
 }
 
 void cOo::BreakPointFunction::activate( void ) {
