@@ -1,6 +1,12 @@
 #ifndef __TrajectoryEngine__cOoVuzikXML__
 #define __TrajectoryEngine__cOoVuzikXML__
 
+#define VUZIK_Y_MAX 1048
+#define VUZIK_Y_MIN 16
+#define VUZIK_PITCH_MIN 0.0
+#define VUZIK_PITCH_MAX  33.0
+
+
 #include <iostream>
 #include "ofMain.h"
 
@@ -13,7 +19,6 @@ namespace cOo {
         enum vuzikColor {
             SOP, ALT, TEN, BAS
         };
-        
         
     public:
         void init(long size, double line_w, int A, int R, int G, int B);

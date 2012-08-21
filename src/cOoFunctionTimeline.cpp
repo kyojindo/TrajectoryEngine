@@ -415,5 +415,5 @@ void cOo::FunctionTimeline::print( void ) {
 }
 
 double cOo::FunctionTimeline::tempPitchConverter(double in_p) {
-    return pitch_out_min+ (pitch_in_max-in_p)*(pitch_out_max-pitch_out_min)/(pitch_in_max-pitch_in_min);
+    return VUZIK_PITCH_MIN + (VUZIK_Y_MAX-in_p)*(VUZIK_PITCH_MAX-VUZIK_PITCH_MIN)/(VUZIK_Y_MAX-VUZIK_Y_MIN);
 }
