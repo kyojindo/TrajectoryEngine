@@ -134,7 +134,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         int lineType =VuzikXML::parseVuzikLineType(vuzikLines[id-1].red);
         
         // set the BPF properties
-        (*t)->setProperties( id, lineType);
+        (*t)->setProperties( id, lineType, false );
 
         
         bpfSize = vuzikLines[id-1].getSize();
@@ -513,10 +513,6 @@ void cOo::FunctionTimeline::print( void ) {
 }
 
 double cOo::FunctionTimeline::tempPitchConverter(double in_p) {
-<<<<<<< HEAD
-    return VUZIK_PITCH_MIN + (VUZIK_Y_MAX-in_p)*(VUZIK_PITCH_MAX-VUZIK_PITCH_MIN)/(VUZIK_Y_MAX-VUZIK_Y_MIN);
-=======
     
-    return pitch_out_min+ (pitch_in_max-in_p)*(pitch_out_max-pitch_out_min)/(pitch_in_max-pitch_in_min);
->>>>>>> Finalized the rendering.
+    return VUZIK_PITCH_MIN + (VUZIK_Y_MAX-in_p)*(VUZIK_PITCH_MAX-VUZIK_PITCH_MIN)/(VUZIK_Y_MAX-VUZIK_Y_MIN);
 }
