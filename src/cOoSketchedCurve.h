@@ -13,7 +13,8 @@ namespace cOo {
       public:
         
         void link( BreakPointFunction *function, ScreenMapper *smap );
-        void generate( void ); void draw( void ); bool isVisible( void );
+        void generate( void ); void destroy( void ); // managing FBO
+        void draw( void ); bool isVisible( void ); // managing draw
         
       protected:
         

@@ -9,8 +9,8 @@ void testApp::setup( void ) {
     
     generateNewScore(); // generate a whole new score in the timeline
     
-    oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
-    oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
+    oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
+    oscReceiver.setup( 9000 ); // receive OSC on port 8000 (local)
     
     zoomFactor = 1.0f; // set zoom factor to default
     zoomTimeline( zoomFactor ); // and apply the zoom
@@ -45,6 +45,7 @@ void testApp::update( void ) {
 
 void testApp::draw( void ) {
     
+    nOfVisible = 0;
     list<SketchedCurve>::iterator skc;
     
     glEnable( GL_BLEND ); // GL options are resent at draw
@@ -64,7 +65,7 @@ void testApp::draw( void ) {
     while( secLoc < ofGetWidth() ) {
     
         secLoc = screenMapper.getXfromTime( secVal );
-        secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 10 );
+        secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 25 );
         ofSetLineWidth( 2 ); ofLine( secLoc, 0, secLoc, ofGetHeight() );
     }
     
@@ -81,8 +82,8 @@ void testApp::draw( void ) {
     
     sketchedCurveAccess.lock();
     for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end();
-    skc++ ) (*skc).draw(); // we draw the FBO-based curves
-    sketchedCurveAccess.unlock();
+    skc++ ) { (*skc).draw(); if( (*skc).isVisible() ) nOfVisible++; }
+    sketchedCurveAccess.unlock(); // we draw the FBO-based curves
     
     // draw circles for touched data sets
     for( long k=0; k<dTouched.size(); k++ ) {
@@ -116,6 +117,8 @@ void testApp::draw( void ) {
         screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
         playbackAccess.unlock();
     }
+    
+    ofDrawBitmapString( ofToString( nOfVisible ), 20, 60 );
 }
 
 void testApp::movePlaybackTime( Time time ) {
@@ -141,7 +144,7 @@ void testApp::zoomTimeline( double factor ) {
     if( factor < 0.000001f ) factor = 0.000001f;
     
     float pOffset = screenMapper.getXfromTime( playbackTime );
-    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 20.0f ) );
+    screenMapper.setPixelPerSec( factor * ( ofGetWidth() / 10.0f ) );
     double newPbt = screenMapper.getTimefromX( pOffset );
     screenMapper.incTimeOffset( newPbt-playbackTime );
     
@@ -266,12 +269,13 @@ void testApp::generateNewScore( void ) {
     list<SketchedCurve>::iterator skc;
     list<BreakPointFunction *>::iterator bpf;
     
-    timeline.clear(); sketchedCurve.clear(); // clear everything
+    for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end(); skc++ ) {
+    (*skc).destroy(); } timeline.clear(); sketchedCurve.clear(); // clear
     
     timeline.generate( scoreDuration ); // generate a random score
-    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
+    sketchedCurve.resize( timeline.getSize() ); // resize rendering
     
-    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
+    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!=timeline.getEnd();
     bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
 }
 
@@ -287,12 +291,12 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         
         if( !app->playAsLoop ) app->timer.stop();
         
-        app->movePlaybackTime( 0.0f );
-        app->screenMapper.setTimeOffset( 0.0f );
-        
         app->sketchedCurveAccess.lock();
         app->generateNewScore();
         app->sketchedCurveAccess.unlock();
+        
+        app->movePlaybackTime( 0.0f );
+        app->screenMapper.setTimeOffset( 0.0f );
         
     } else {
     

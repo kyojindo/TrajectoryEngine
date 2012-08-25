@@ -65,6 +65,15 @@ void cOo::SketchedCurve::generate( void ) {
     fbo->end();
 }
 
+void cOo::SketchedCurve::destroy( void ) {
+
+    if( fbo != NULL ) {
+        
+        //delete fbo;
+        //fbo = NULL;
+    }
+}
+
 void cOo::SketchedCurve::draw( void ) {
     
     float xMin = screenMapper->getXfromTime( bpf->getMinTime() );
