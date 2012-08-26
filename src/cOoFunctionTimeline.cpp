@@ -152,7 +152,7 @@ void cOo::FunctionTimeline::generate( Time maxTime ) {
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
     
-    scoreMaxTime += 30.0f; // trick to add some room at the end
+    scoreMaxTime += 20.0f; // trick to add some room at the end
 }
 
 void cOo::FunctionTimeline::clear( void ) {
