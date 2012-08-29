@@ -16,7 +16,11 @@ void testApp::setup( void ) {
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     fullScreen = false;
-    playAsLoop = true;
+    playAsLoop = false;
+    
+    showSplashScreen = true;
+    
+    splashScreen.loadImage("splash.png");
 }
 
 void testApp::exit( void ) {
@@ -45,80 +49,88 @@ void testApp::update( void ) {
 
 void testApp::draw( void ) {
     
-    nOfVisible = 0;
-    list<SketchedCurve>::iterator skc;
-    
-    glEnable( GL_BLEND ); // GL options are resent at draw
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
-    
-    for( int k=0; k<nOfSemitones; k++ ) {
-    
-        // [TODO] replace this by a screenMapper-based call and stuff
-        float semiLoc = ofMap( k, 0, nOfSemitones, 0, ofGetHeight() );
-        ofSetColor( 255, 255, 255, 30 ); ofSetLineWidth( 2 );
-        ofLine( 0, semiLoc, ofGetWidth(), semiLoc );
+    if (showSplashScreen) {
+        int x = ofGetWidth()/2 - splashScreen.width/2;
+        int y = ofGetHeight()/2 - splashScreen.height/2;
+        splashScreen.draw(x, y);
     }
+    else {
     
-    Time secVal = 0.0f;
-    float secLoc = 0.0f;
-    
-    while( secLoc < ofGetWidth() ) {
-    
-        secLoc = screenMapper.getXfromTime( secVal );
-        secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 25 );
-        ofSetLineWidth( 2 ); ofLine( secLoc, 0, secLoc, ofGetHeight() );
-    }
-    
-    // memory-protected exchange of data
-    OSMemoryBarrier(); dTouched = sTouched;
-    
-    playbackAccess.lock(); // playback time is locked
-    float tVal = screenMapper.getXfromTime( playbackTime );
-    playbackAccess.unlock(); // and used to update
-    
-    // we draw the line following the playback time
-    ofSetColor( 255, 255, 255, 100 ); ofSetLineWidth( 2 );
-    ofLine( tVal, 0, tVal, ofGetHeight() );
-    
-    sketchedCurveAccess.lock();
-    for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end();
-    skc++ ) { (*skc).draw(); if( (*skc).isVisible() ) nOfVisible++; }
-    sketchedCurveAccess.unlock(); // we draw the FBO-based curves
-    
-    // draw circles for touched data sets
-    for( long k=0; k<dTouched.size(); k++ ) {
+        nOfVisible = 0;
+        list<SketchedCurve>::iterator skc;
         
-        float yTouch = ofMap( dTouched[k].data.getPitch(), 0, 33, ofGetHeight(), 0 );
-        float xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
+        glEnable( GL_BLEND ); // GL options are resent at draw
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
         
-        color.setHue( colorMap.get( dTouched[k].type ) ); ofNoFill();
+        for( int k=0; k<nOfSemitones; k++ ) {
         
-        color.setBrightness( 100 ); color.setSaturation( 140 );
-        ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 13 );
+            // [TODO] replace this by a screenMapper-based call and stuff
+            float semiLoc = ofMap( k, 0, nOfSemitones, 0, ofGetHeight() );
+            ofSetColor( 255, 255, 255, 30 ); ofSetLineWidth( 2 );
+            ofLine( 0, semiLoc, ofGetWidth(), semiLoc );
+        }
         
-        color.setBrightness( 220 ); color.setSaturation( 220 );
-        ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 14 );
+        Time secVal = 0.0f;
+        float secLoc = 0.0f;
         
-        color.setBrightness( 150 ); color.setSaturation( 180 );
-        ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 15 );
-    }
-    
-    playbackAccess.lock();
-    ofSetColor( 200, 200, 200 ); // draw playback time
-    ofDrawBitmapString( ofToString( playbackTime ), 20, 30 );
-    playbackAccess.unlock();
-    
-    // manage the shifting of the screen ~ playback
-    if( tVal > ofGetWidth()/2 && timeline.getMaxTime() >
-       screenMapper.getTimefromX( ofGetWidth() ) ) {
+        while( secLoc < ofGetWidth() ) {
+        
+            secLoc = screenMapper.getXfromTime( secVal );
+            secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 25 );
+            ofSetLineWidth( 2 ); ofLine( secLoc, 0, secLoc, ofGetHeight() );
+        }
+        
+        // memory-protected exchange of data
+        OSMemoryBarrier(); dTouched = sTouched;
+        
+        playbackAccess.lock(); // playback time is locked
+        float tVal = screenMapper.getXfromTime( playbackTime );
+        playbackAccess.unlock(); // and used to update
+        
+        // we draw the line following the playback time
+        ofSetColor( 255, 255, 255, 100 ); ofSetLineWidth( 2 );
+        ofLine( tVal, 0, tVal, ofGetHeight() );
+        
+        sketchedCurveAccess.lock();
+        for( skc=sketchedCurve.begin(); skc!=sketchedCurve.end();
+        skc++ ) { (*skc).draw(); if( (*skc).isVisible() ) nOfVisible++; }
+        sketchedCurveAccess.unlock(); // we draw the FBO-based curves
+        
+        // draw circles for touched data sets
+        for( long k=0; k<dTouched.size(); k++ ) {
+            
+            float yTouch = ofMap( dTouched[k].data.getPitch(), 0, 33, ofGetHeight(), 0 );
+            float xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
+            
+            color.setHue( colorMap.get( dTouched[k].type ) ); ofNoFill();
+            
+            color.setBrightness( 100 ); color.setSaturation( 140 );
+            ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 13 );
+            
+            color.setBrightness( 220 ); color.setSaturation( 220 );
+            ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 14 );
+            
+            color.setBrightness( 150 ); color.setSaturation( 180 );
+            ofSetColor( color, 200 ); ofCircle( xTouch, yTouch, 15 );
+        }
         
         playbackAccess.lock();
-        screenMapper.incTimeOffset( -( playbackTime-
-        screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
+        ofSetColor( 200, 200, 200 ); // draw playback time
+        ofDrawBitmapString( ofToString( playbackTime ), 20, 30 );
         playbackAccess.unlock();
+        
+        // manage the shifting of the screen ~ playback
+        if( tVal > ofGetWidth()/2 && timeline.getMaxTime() >
+           screenMapper.getTimefromX( ofGetWidth() ) ) {
+            
+            playbackAccess.lock();
+            screenMapper.incTimeOffset( -( playbackTime-
+            screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
+            playbackAccess.unlock();
+        }
+        
+        ofDrawBitmapString( ofToString( nOfVisible ), 20, 60 );
     }
-    
-    ofDrawBitmapString( ofToString( nOfVisible ), 20, 60 );
 }
 
 void testApp::movePlaybackTime( Time time ) {
@@ -158,7 +170,10 @@ void testApp::moveTimeline( Time shift ) {
 
 void testApp::startPlayback( void ) {
 
-    if( !timer.isRunning() ) timer.start();
+    if( !timer.isRunning() ) {
+        showSplashScreen = false;
+        timer.start();
+    }
 }
 
 void testApp::pausePlayback( void ) {
@@ -297,6 +312,8 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         
         app->movePlaybackTime( 0.0f );
         app->screenMapper.setTimeOffset( 0.0f );
+        
+        app->showSplashScreen = true;
         
     } else {
     

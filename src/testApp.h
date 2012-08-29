@@ -77,4 +77,7 @@ class testApp : public ofBaseApp {
     ofxOscMessage message; // message
     
     int nOfVisible;
+    
+    bool showSplashScreen;
+    ofImage splashScreen;
 };
