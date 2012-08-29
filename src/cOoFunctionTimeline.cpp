@@ -14,6 +14,110 @@ cOo::FunctionTimeline::~FunctionTimeline( void ) {
     }
 }
 
+void cOo::FunctionTimeline::loadMidiImport() {
+    ofBuffer file = ofBufferFromFile("midi_import.txt");
+    string line;
+    
+    MIDIText voices[NUM_MIDI_VOICES];
+    
+        
+    long numNotesRead = 0;
+    long numDiscarded = 0;
+    
+    int max_pitch = INT_MIN;
+    int min_pitch = INT_MAX;
+    
+    while (!file.isLastLine()) {
+
+        line = file.getNextLine();
+        
+        int ch;
+        double time;
+        int note;
+        int vel;
+        
+        int numArgs = sscanf(line.c_str(), "%i %lf %i %i", &ch, &time, &note, &vel);
+        //printf("loaded: %s \n", line.c_str());
+        //printf("parsed: %i %lf %i %i\n",ch, time, note, vel);
+    
+        if ( (numArgs == 4) && (ch>0) && (note>0) ) {
+            numNotesRead++;
+            
+            //if previous point on same track has same time stamp, disregard it (double).
+            if (voices[ch-1].time.size() && (time == voices[ch-1].time.back()) ) {
+                voices[ch-1].time.pop_back();
+                voices[ch-1].pitch.pop_back();
+                voices[ch-1].velocity.pop_back();
+                numDiscarded++;
+            }
+            
+            // add to list
+            voices[ch-1].time.push_back(time);
+            voices[ch-1].pitch.push_back(note);
+            voices[ch-1].velocity.push_back(vel);
+            
+            
+            if (note < min_pitch)
+                min_pitch = note;
+            
+            if (note > max_pitch)
+                max_pitch = note;
+        }
+        
+    }
+    printf("numRead = %li numDiscarded= %li\n", numNotesRead, numDiscarded);
+    printf("minpitch = %i max = %i\n", min_pitch, max_pitch);
+    
+    long id = 0;
+    long bpfSize;
+    DataSet dataSet;
+    startList.resize(4);
+    stopList.resize( 4 );
+    scoreMaxTime = 30.0;
+    
+    for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
+        //printf("adding line %li\n",id);
+        
+        (*t) = new BreakPointFunction();
+    
+            
+        int lineType =id;
+        
+        // set the BPF properties
+        (*t)->setProperties( id, lineType, false );
+        
+        
+        bpfSize = voices[id].time.size();
+        
+        dataSet.pitch = voices[id].pitch.front() - 50;
+        
+        dataSet.velocity = voices[id].velocity.front();
+        
+        dataSet.time = voices[id].time.front();
+        
+        for( long k=0; k<bpfSize; k++ ) {
+            
+            (*t)->addDataSet( dataSet );
+            
+            dataSet.pitch = voices[id].pitch[k] - 50;
+            dataSet.velocity = voices[id].velocity[k];
+            dataSet.time = voices[id].time[k];
+            printf("%lf\n",dataSet.time);
+            
+        }
+    }
+    
+    
+    // sort startList by startTime order ( using overladed predicate )
+    startList.sort( cOo::BreakPointFunction::startTimeSortPredicate );
+    
+    stopList = startList; // copy and sort stopList by stopTime order
+    stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
+    
+    scoreMaxTime += 2.0f; // trick to add some room at the end
+    
+}
+
 void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
     
     long id = 1;
@@ -166,6 +270,10 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
     
     scoreMaxTime += 2.0f; // trick to add some room at the end
+    
+    //cleanup
+    
+    delete vuzikLines;
 }
 
 // --- fill the timeline with random curves ----
