@@ -5,7 +5,7 @@ void testApp::setup( void ) {
     ofEnableAlphaBlending(); ofEnableSmoothing();
     ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
     
-    timer.setup( 128, 0.005, &playbackTimeInc, this ); // timer setup
+    timer.setup( 128, 0.03, &playbackTimeInc, this ); // timer setup
     
     generateNewScore(); // generate a whole new score in the timeline
     

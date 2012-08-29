@@ -15,7 +15,7 @@
 using namespace cOo;
 
 const int nOfSemitones = 33;
-const float scoreDuration = 60.0f;
+const float scoreDuration = 180.0f;
 
 class testApp : public ofBaseApp {
     
