@@ -8,7 +8,7 @@
 #include "cOoBreakPointFunction.h"
 #include "ofxXmlSettings.h"
 #include "cOoVuzikXML.h"
-#include "cOoMIDIText.h"
+#include "cOoMIDITextTrack.h"
 
 #include "ofMain.h"
 
@@ -35,7 +35,7 @@ namespace cOo {
         FunctionTimeline( void );
         ~FunctionTimeline( void );
         
-        void load( long tlSize, long bpfSize, Time maxTime );
+        void loadVuzikFile();
         
         void loadMidiImport();
         

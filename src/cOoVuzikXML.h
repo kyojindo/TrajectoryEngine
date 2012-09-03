@@ -17,7 +17,8 @@ namespace cOo {
     class VuzikXML {
         
         enum vuzikColor {
-            SOP, ALT, TEN, BAS
+            //SOP, RED, ALT, YELLOW, GREEN, TEN, NAVY, GRAY
+            PINK, RED, ORANGE, YELLOW, GREEN, LIGHT_BLUE, NAVY, GRAY
         };
         
     public:
@@ -31,6 +32,8 @@ namespace cOo {
         double getX(long idx) {return X[idx];}
         double getY(long idx) {return Y[idx];}
         double getPitch(long idx);
+        
+        double getLineWidth() {return lineWidth;}
         
         long getSize() {return numPts;}
         

@@ -15,18 +15,25 @@ cOo::FunctionTimeline::~FunctionTimeline( void ) {
 }
 
 void cOo::FunctionTimeline::loadMidiImport() {
-    ofBuffer file = ofBufferFromFile("midi_import.txt");
+    ofBuffer file = ofBufferFromFile("midi_import2.txt");
     string line;
     
-    MIDIText voices[NUM_MIDI_VOICES];
-    
-        
-    long numNotesRead = 0;
+    MIDITextTrack voices[NUM_MIDI_VOICES];
+    long numMidiSigs = 0;
     long numDiscarded = 0;
+    long numNotes = 0;
+    long numJoins = 0; //when a note off happens at the same time as a new note: join
+                        // these two notes together to form one bpf
+    long numBpfs = 0;
     
     int max_pitch = INT_MIN;
     int min_pitch = INT_MAX;
     
+    double min_time = DBL_MAX;
+    double max_time = DBL_MIN;
+
+    
+    //STEP 1: parse. fill vector with raw midi track data, seperate by channel
     while (!file.isLastLine()) {
 
         line = file.getNextLine();
@@ -36,44 +43,85 @@ void cOo::FunctionTimeline::loadMidiImport() {
         int note;
         int vel;
         
-        int numArgs = sscanf(line.c_str(), "%i %lf %i %i", &ch, &time, &note, &vel);
+        int numArgs = sscanf(line.c_str(), "%i %i %i %lf", &note, &vel, &ch, &time);
+        
+
         //printf("loaded: %s \n", line.c_str());
         //printf("parsed: %i %lf %i %i\n",ch, time, note, vel);
-    
+        
+        //every note is accompanied by a note off, so we can count notes this way
+        if (vel == 0)
+            numNotes++;
+        
         if ( (numArgs == 4) && (ch>0) && (note>0) ) {
-            numNotesRead++;
+            //we parsed a valid midi note value
+            numMidiSigs++;
             
-            //if previous point on same track has same time stamp, disregard it (double).
-            if (voices[ch-1].time.size() && (time == voices[ch-1].time.back()) ) {
-                voices[ch-1].time.pop_back();
-                voices[ch-1].pitch.pop_back();
-                voices[ch-1].velocity.pop_back();
-                numDiscarded++;
-            }
-            
-            // add to list
+            // add current point to list
             voices[ch-1].time.push_back(time);
-            voices[ch-1].pitch.push_back(note);
-            voices[ch-1].velocity.push_back(vel);
+            voices[ch-1].pitch.push_back((double)note);
+            voices[ch-1].velocity.push_back((double)vel/127.0);
             
+            if (note < min_pitch) min_pitch = note;
+            if (note > max_pitch) max_pitch = note;
             
-            if (note < min_pitch)
-                min_pitch = note;
-            
-            if (note > max_pitch)
-                max_pitch = note;
+            if (time < min_time) min_time = time;
+            if (time > max_time) max_time = time;
         }
         
     }
-    printf("numRead = %li numDiscarded= %li\n", numNotesRead, numDiscarded);
-    printf("minpitch = %i max = %i\n", min_pitch, max_pitch);
+    printf("min = %i max = %i\n", min_pitch, max_pitch);
+    printf("t = %lf to %lf sec\n", min_time, max_time);
+    
+    //STEP 2: convert. go through array of MIDI tracks (by channel) and turn them into BPF's
+    vector <BreakPointFunction> parsedBPFs;
+    (*t) = new BreakPointFunction();
+    long bpf_idx = 0;
+    
+    for (int i=0; i<NUM_MIDI_VOICES; i++) {
+        //i == MIDI channel == line type
+        for (int j=0; j<voices[i].time.size(); j++) {
+            
+            DataSet rec;
+            //if current record is a keyoff (vel==0):
+            // 1.) duplicate previous point in track to extend the drawing horizontally to the end of the note
+            // 2.) add that to the line before inserting the keyoff point.
+            // 3.) add keyoff
+            if (voices[i].velocity[j] == 0) {
+                rec.time = voices[i].time[j];
+                rec.pitch = voices[i].pitch[j];
+                rec.velocity = voices[i].velocity[j];
+                (*t)->addDataSet(rec);
+                
+
+            }
+            //add current point
+            rec.time = voices[i].time[j];
+            rec.pitch = voices[i].pitch[j];
+            rec.velocity = voices[i].velocity[j];
+            (*t)->addDataSet(rec);
+            
+            
+            if (0) { //end of BPF found; add current to list and start new one
+                (*t) = new BreakPointFunction();
+                
+            }
+        }
+    }
+    
+    scoreMaxTime = max_time;
+    /*
     
     long id = 0;
     long bpfSize;
-    DataSet dataSet;
-    startList.resize(4);
-    stopList.resize( 4 );
-    scoreMaxTime = 30.0;
+
+    stopList.resize(startList.size());
+    startList.sort( cOo::BreakPointFunction::startTimeSortPredicate );
+    
+    stopList = startList;
+    stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
+    
+    //scoreMaxTime = 130.0;
     
     for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
         //printf("adding line %li\n",id);
@@ -87,9 +135,9 @@ void cOo::FunctionTimeline::loadMidiImport() {
         (*t)->setProperties( id, lineType, false );
         
         
-        bpfSize = voices[id].time.size();
+        bpfSize = parsedBPFs[id].getSize();
         
-        dataSet.pitch = voices[id].pitch.front() - 50;
+        dataSet.pitch = parsedBPFs[id]. front() - min_pitch;
         
         dataSet.velocity = voices[id].velocity.front();
         
@@ -99,10 +147,10 @@ void cOo::FunctionTimeline::loadMidiImport() {
             
             (*t)->addDataSet( dataSet );
             
-            dataSet.pitch = voices[id].pitch[k] - 50;
-            dataSet.velocity = voices[id].velocity[k];
+            dataSet.pitch = voices[id].pitch[k] - min_pitch;
+            dataSet.velocity = (float)voices[id].velocity[k]/128.0f;
             dataSet.time = voices[id].time[k];
-            printf("%lf\n",dataSet.time);
+            //printf("%lf\n",dataSet.time);
             
         }
     }
@@ -113,30 +161,35 @@ void cOo::FunctionTimeline::loadMidiImport() {
     
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
+     */
     
     scoreMaxTime += 2.0f; // trick to add some room at the end
     
 }
 
-void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
+void cOo::FunctionTimeline::loadVuzikFile() {
     
+    Time maxTime;
+    long bpfSize;
     long id = 1;
     double startTime;
     DataSet dataSet;
     ofxXmlSettings xmlFile;
     VuzikXML* vuzikLines;
     
+    string filename = "study10-voices.xml";
+    //string filename = "data.xml";
     
     //test load data
-    if (xmlFile.loadFile("data.xml")){
-		printf("data.xml loaded!\n");
+    if (xmlFile.loadFile(filename)){
+		printf("%s loaded!\n", filename.c_str());
 	}else{
-		printf("unable to load data.xml check data/ folder");
+		printf("unable to load %s check data/ folder\n", filename.c_str());
 	}
     bool push = xmlFile.pushTag("Graphics");
-    if (push) printf("Graphics OK\n");
+    //if (push) printf("Graphics OK\n");
     push = xmlFile.pushTag("Graphics");
-    if (push) printf("OK\n");
+    //if (push) printf("OK\n");
     int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
     printf("num polyLines read in data = %i\n", numLines);
     
@@ -245,7 +298,7 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
         
         dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(0));
         
-        dataSet.velocity = (double)rand() / (double)RAND_MAX;
+        dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
         
         
         dataSet.time = 0.5+(vuzikLines[id-1].getX(0)-x_in_min)*maxTime/(x_in_max-x_in_min);
@@ -256,7 +309,6 @@ void cOo::FunctionTimeline::load( long tlSize, long bpfSize, Time maxTime ) {
             
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
             dataSet.velocity += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
-            
             dataSet.time = 0.5+(vuzikLines[id-1].getX(k)-x_in_min)*maxTime/(x_in_max-x_in_min);
             
         }

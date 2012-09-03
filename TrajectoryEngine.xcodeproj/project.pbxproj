@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53E5E6A415EDCD8E00DEAD69 /* cOoMIDIText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E5E6A215EDCD8E00DEAD69 /* cOoMIDIText.cpp */; };
+		53E5E6A415EDCD8E00DEAD69 /* cOoMIDITextTrack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53E5E6A215EDCD8E00DEAD69 /* cOoMIDITextTrack.cpp */; };
 		9F1E5F2815D2860A00194F56 /* cOoAudioTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F1E5F2615D2860A00194F56 /* cOoAudioTimer.cpp */; };
 		9F1E5F5315D2D05900194F56 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F1E5F2F15D2D05900194F56 /* IpEndpointName.cpp */; };
 		9F1E5F5415D2D05900194F56 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F1E5F3415D2D05900194F56 /* NetworkingUtils.cpp */; };
@@ -81,8 +81,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		53E5E6A215EDCD8E00DEAD69 /* cOoMIDIText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoMIDIText.cpp; sourceTree = "<group>"; };
-		53E5E6A315EDCD8E00DEAD69 /* cOoMIDIText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoMIDIText.h; sourceTree = "<group>"; };
+		53E5E6A215EDCD8E00DEAD69 /* cOoMIDITextTrack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoMIDITextTrack.cpp; sourceTree = "<group>"; };
+		53E5E6A315EDCD8E00DEAD69 /* cOoMIDITextTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoMIDITextTrack.h; sourceTree = "<group>"; };
 		9F1E5F2615D2860A00194F56 /* cOoAudioTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cOoAudioTimer.cpp; sourceTree = "<group>"; };
 		9F1E5F2715D2860A00194F56 /* cOoAudioTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cOoAudioTimer.h; sourceTree = "<group>"; };
 		9F1E5F2F15D2D05900194F56 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
@@ -327,8 +327,8 @@
 			children = (
 				D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */,
 				D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */,
-				53E5E6A215EDCD8E00DEAD69 /* cOoMIDIText.cpp */,
-				53E5E6A315EDCD8E00DEAD69 /* cOoMIDIText.h */,
+				53E5E6A215EDCD8E00DEAD69 /* cOoMIDITextTrack.cpp */,
+				53E5E6A315EDCD8E00DEAD69 /* cOoMIDITextTrack.h */,
 			);
 			name = Import;
 			sourceTree = "<group>";
@@ -578,7 +578,7 @@
 				9FC5BC3715DA56400076638F /* cOoSketchedCurve.cpp in Sources */,
 				9FC5BC3A15DA5D930076638F /* cOoScreenMapper.cpp in Sources */,
 				9FA2638115E3C123000780E2 /* cOoColorMap.cpp in Sources */,
-				53E5E6A415EDCD8E00DEAD69 /* cOoMIDIText.cpp in Sources */,
+				53E5E6A415EDCD8E00DEAD69 /* cOoMIDITextTrack.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -745,7 +745,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = TrajectoryEngine;
-				SDKROOT = macosx10.6;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -832,7 +832,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = TrajectoryEngine;
-				SDKROOT = macosx10.6;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

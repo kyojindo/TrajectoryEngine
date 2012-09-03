@@ -28,18 +28,31 @@ int cOo::VuzikXML::parseVuzikLineType(int r) {
 
     switch (r) {
         case 237:
-            return SOP;
+            return YELLOW;
             break;
         case 206:
-            return ALT;
+            return PINK;
             break;
         case 168:
-            return TEN;
+            return RED;
             break;
         case 245:
-            return BAS;
+            return ORANGE;
+            break;
+        case 114:
+            return LIGHT_BLUE;
+            break;
+        case 0:
+            return NAVY;
+            break;
+        case 141:
+            return GREEN;
+            break;
+        case 195:
+            return GRAY;
             break;
         default:
+            printf("invalid line found!!\n");
             return -1;
     }
 }

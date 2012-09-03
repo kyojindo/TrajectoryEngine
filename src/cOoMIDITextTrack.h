@@ -19,14 +19,14 @@ using namespace std;
 
 namespace cOo {
     
-    class MIDIText {
+    class MIDITextTrack {
     public:
         
         vector<double> time;
         vector<double> pitch;
         vector<double> velocity;
         
-        
+        int channel;
         
     };
 }
