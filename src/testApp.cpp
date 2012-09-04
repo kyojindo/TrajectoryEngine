@@ -8,9 +8,9 @@ void testApp::setup( void ) {
     ofEnableAlphaBlending(); ofEnableSmoothing();
     ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
     
-    timeline.generate( 180.0f ); // generate a random score of given time
+    //timeline.generate( 180.0f ); // generate a random score of given time
     //timeline.loadMidiImport();
-    //timeline.loadVuzikFile();
+    timeline.loadVuzikFile("icmc/combined.xml");
     timer.setup( 128, 0.005, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     

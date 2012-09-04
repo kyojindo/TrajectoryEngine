@@ -2,9 +2,9 @@
 #define __TrajectoryEngine__cOoVuzikXML__
 
 #define VUZIK_Y_MAX 1048
-#define VUZIK_Y_MIN 16
-#define VUZIK_PITCH_MIN 0.0
-#define VUZIK_PITCH_MAX  33.0
+#define VUZIK_Y_MIN 0
+#define VUZIK_PITCH_MIN 0.5
+#define VUZIK_PITCH_MAX  33.5
 
 
 #include <iostream>

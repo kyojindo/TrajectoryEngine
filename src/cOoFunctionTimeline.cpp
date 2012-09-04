@@ -92,8 +92,6 @@ void cOo::FunctionTimeline::loadMidiImport() {
                 rec.pitch = voices[i].pitch[j];
                 rec.velocity = voices[i].velocity[j];
                 (*t)->addDataSet(rec);
-                
-
             }
             //add current point
             rec.time = voices[i].time[j];
@@ -110,74 +108,30 @@ void cOo::FunctionTimeline::loadMidiImport() {
     }
     
     scoreMaxTime = max_time;
-    /*
-    
-    long id = 0;
-    long bpfSize;
-
-    stopList.resize(startList.size());
-    startList.sort( cOo::BreakPointFunction::startTimeSortPredicate );
-    
-    stopList = startList;
-    stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
-    
-    //scoreMaxTime = 130.0;
-    
-    for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
-        //printf("adding line %li\n",id);
-        
-        (*t) = new BreakPointFunction();
-    
-            
-        int lineType =id;
-        
-        // set the BPF properties
-        (*t)->setProperties( id, lineType, false );
-        
-        
-        bpfSize = parsedBPFs[id].getSize();
-        
-        dataSet.pitch = parsedBPFs[id]. front() - min_pitch;
-        
-        dataSet.velocity = voices[id].velocity.front();
-        
-        dataSet.time = voices[id].time.front();
-        
-        for( long k=0; k<bpfSize; k++ ) {
-            
-            (*t)->addDataSet( dataSet );
-            
-            dataSet.pitch = voices[id].pitch[k] - min_pitch;
-            dataSet.velocity = (float)voices[id].velocity[k]/128.0f;
-            dataSet.time = voices[id].time[k];
-            //printf("%lf\n",dataSet.time);
-            
-        }
-    }
-    
+       
     
     // sort startList by startTime order ( using overladed predicate )
     startList.sort( cOo::BreakPointFunction::startTimeSortPredicate );
     
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
-     */
     
     scoreMaxTime += 2.0f; // trick to add some room at the end
     
 }
 
-void cOo::FunctionTimeline::loadVuzikFile() {
+void cOo::FunctionTimeline::loadVuzikFile(string filename) {
     
-    Time maxTime;
+    Time maxTime = 0.0;
     long bpfSize;
     long id = 1;
     double startTime;
     DataSet dataSet;
     ofxXmlSettings xmlFile;
-    VuzikXML* vuzikLines;
+    vector <VuzikXML> vuzikLines;
     
-    string filename = "study10-voices.xml";
+    //string filename = "MP-toWhirl.xml";
+    //string filename = "study10-voices.xml";
     //string filename = "data.xml";
     
     //test load data
@@ -186,89 +140,119 @@ void cOo::FunctionTimeline::loadVuzikFile() {
 	}else{
 		printf("unable to load %s check data/ folder\n", filename.c_str());
 	}
-    bool push = xmlFile.pushTag("Graphics");
-    //if (push) printf("Graphics OK\n");
-    push = xmlFile.pushTag("Graphics");
-    //if (push) printf("OK\n");
-    int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
-    printf("num polyLines read in data = %i\n", numLines);
+    int numCombinedScores = xmlFile.getNumTags("Graphics");
+    printf("num scores = %i\n", numCombinedScores);
     
-    if (numLines > 0) {
-        //only parse the file if there is at least one line tag
+    long totalLines = 0;
+    double x_offset = 0.0;
+    
+    x_in_min = 0;
+    x_in_max = DBL_MIN;
+    
+    for (int s=0; s<numCombinedScores; s++) {
         
-        vuzikLines = new VuzikXML[numLines];
-                
-        double x_min = DBL_MAX;
+        double x_min = 0;
         double x_max = DBL_MIN;
         double y_min = DBL_MAX;
         double y_max = DBL_MIN;
+    
+        bool push = xmlFile.pushTag("Graphics",s);
+    
+        if (push) printf("score # %i OK\n", s);
+        push = xmlFile.pushTag("Graphics");
+        //if (push) printf("OK\n");
+        int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
+        printf("num polyLines read in data = %i\n", numLines);
         
-        for(long l=0; l<numLines; l++) {
+        if (numLines > 0) {
+            //only parse the file if there is at least one line tag
+            
+            for(long l=0; l<numLines; l++) {
 
-            push = xmlFile.pushTag("PropertiesGraphicsPolyLine", l);
- //           if (push) printf("loading polyLine %li...  ", l);
-            
-            double line_w = xmlFile.getValue("LineWidth", -1.0);
- //           printf("line_w = %f\n",line_w);
-            
-            //load line color
-            
-            push = xmlFile.pushTag("ObjectColor");
-            
-            double valA = xmlFile.getValue("A", -1.0);
-            
-            double valR = xmlFile.getValue("R", -1.0);
-            
-            double valG = xmlFile.getValue("G", -1.0);
-            
-            double valB = xmlFile.getValue("B", -1.0);
-            
-            xmlFile.popTag(); //ObjectColor
-            
-            push = xmlFile.pushTag("Points");
-//            if (push) printf("Points OK\n");
-            
-            int numPts = xmlFile.getNumTags("Point");
-//            printf("num points read in line = %i\n", numPts);
-            
-            //save line data into structure
-            vuzikLines[l].init(numPts, line_w, valA, valR, valG, valB);
-            
-            if (numPts>0) {
-                for (int i=0; i<numPts; i++) {
-                    double x = xmlFile.getValue("Point:X", 0.0, i);
-                    double y = xmlFile.getValue("Point:Y", 0.0, i);
-                    if (x>x_max) x_max = x;
-                    if (x<x_min) x_min = x;
-                    if (y>y_max) y_max = y;
-                    if (y<y_min) y_min = y;
-                    
-                    vuzikLines[l].setX(x, i);
-                    vuzikLines[l].setY(y, i);
-                    //printf("x:y = %f:%f\n", x,y);
+                push = xmlFile.pushTag("PropertiesGraphicsPolyLine", l);
+     //           if (push) printf("loading polyLine %li...  ", l);
+                
+                double line_w = xmlFile.getValue("LineWidth", -1.0);
+     //           printf("line_w = %f\n",line_w);
+                
+                //load line color
+                
+                push = xmlFile.pushTag("ObjectColor");
+                
+                double valA = xmlFile.getValue("A", -1.0);
+                
+                double valR = xmlFile.getValue("R", -1.0);
+                
+                double valG = xmlFile.getValue("G", -1.0);
+                
+                double valB = xmlFile.getValue("B", -1.0);
+                
+                xmlFile.popTag(); //ObjectColor
+                
+                push = xmlFile.pushTag("Points");
+    //            if (push) printf("Points OK\n");
+                
+                int numPts = xmlFile.getNumTags("Point");
+    //            printf("num points read in line = %i\n", numPts);
+                
+                //save line data into structure
+                VuzikXML line;
+                line.init(numPts, line_w, valA, valR, valG, valB);
+                
+                //vuzikLines[l].init(numPts, line_w, valA, valR, valG, valB);
+                
+                if (numPts>0) {
+                    for (int i=0; i<numPts; i++) {
+                        double x = xmlFile.getValue("Point:X", 0.0, i);
+                        double y = xmlFile.getValue("Point:Y", 0.0, i);
+                        if (x>x_max) x_max = x;
+                        //if (x<x_min) x_min = x;
+                        if (y>y_max) y_max = y;
+                        if (y<y_min) y_min = y;
+                        
+                        line.setX(x+x_offset, i);
+                        line.setY(y, i);
+                        //printf("x:y = %f:%f\n", x,y);
+                    }
                 }
+                xmlFile.popTag(); // Points
+                
+                
+                xmlFile.popTag(); //PolyLine
+                //add line to list
+                vuzikLines.push_back(line);
+                
+                
             }
-            xmlFile.popTag(); // Points
+            xmlFile.popTag(); //graphics
+            xmlFile.popTag(); //graphics
+        
+            printf("x_min x_max: %f %f\n", x_min, x_max);
+            printf("y_min y_max: %f %f\n", y_min, y_max);
+            totalLines+= numLines;
             
+            x_offset+= x_max; //increment begin time
+            printf("x_offset pushed to %lf\n",x_offset);
             
-            xmlFile.popTag(); //PolyLine
         }
-        printf("x_min x_max: %f %f\n", x_min, x_max);
-        printf("y_min y_max: %f %f\n", y_min, y_max);
+        //!!!! NOTE: this 100.0 is a tuning factor
         
-        pitch_in_min = 16;
-        pitch_in_max = 1048;
-        pitch_out_min = 0.0;
-        pitch_out_max = 33.0;
+        x_in_max+=x_max; //increment total time (combined offset)
+        maxTime+=x_max/100.0;
+        printf("maxTime increased to  %lf\n",maxTime);
         
-        x_in_min = x_min;
-        x_in_max = x_max;
-        maxTime = x_max/100.0;
     }
     
-    startList.resize( numLines );
-    stopList.resize( numLines );
+    printf("total lines read = %li\n", totalLines);
+    
+    startList.resize( totalLines );
+    stopList.resize( totalLines );
     scoreMaxTime = maxTime;
+    
+    printf("x_max = %lf\n",x_in_max);
+    printf("x_min = %lf\n",x_in_min);
+    
+
     
     for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
         //printf("adding line %li\n",id);
@@ -301,15 +285,17 @@ void cOo::FunctionTimeline::loadVuzikFile() {
         dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
         
         
-        dataSet.time = 0.5+(vuzikLines[id-1].getX(0)-x_in_min)*maxTime/(x_in_max-x_in_min);
+        dataSet.time = 0.5+(vuzikLines[id-1].getX(0))*maxTime/(x_in_max);
         
         for( long k=0; k<bpfSize; k++ ) {
         
             (*t)->addDataSet( dataSet );
             
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
-            dataSet.velocity += 0.04f*(2.0f*((double)rand() / (double)RAND_MAX)-1.0f);
-            dataSet.time = 0.5+(vuzikLines[id-1].getX(k)-x_in_min)*maxTime/(x_in_max-x_in_min);
+            dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
+            dataSet.time = 0.5+(vuzikLines[id-1].getX(k))*maxTime/(x_in_max);
+            
+            //printf("t= %lf\n",dataSet.time);
             
         }
     }
@@ -321,11 +307,9 @@ void cOo::FunctionTimeline::loadVuzikFile() {
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
     
+    //scoreMaxTime = 210.0f;
     scoreMaxTime += 2.0f; // trick to add some room at the end
     
-    //cleanup
-    
-    delete vuzikLines;
 }
 
 // --- fill the timeline with random curves ----

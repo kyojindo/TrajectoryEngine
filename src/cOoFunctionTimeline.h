@@ -35,7 +35,7 @@ namespace cOo {
         FunctionTimeline( void );
         ~FunctionTimeline( void );
         
-        void loadVuzikFile();
+        void loadVuzikFile(string filename);
         
         void loadMidiImport();
         
