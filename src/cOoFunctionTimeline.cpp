@@ -130,11 +130,6 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
     ofxXmlSettings xmlFile;
     vector <VuzikXML> vuzikLines;
     
-    //string filename = "MP-toWhirl.xml";
-    //string filename = "study10-voices.xml";
-    //string filename = "data.xml";
-    
-    //test load data
     if (xmlFile.loadFile(filename)){
 		printf("%s loaded!\n", filename.c_str());
 	}else{
@@ -171,7 +166,6 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
 
                 push = xmlFile.pushTag("PropertiesGraphicsPolyLine", l);
      //           if (push) printf("loading polyLine %li...  ", l);
-                
                 double line_w = xmlFile.getValue("LineWidth", -1.0);
      //           printf("line_w = %f\n",line_w);
                 
@@ -180,26 +174,19 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
                 push = xmlFile.pushTag("ObjectColor");
                 
                 double valA = xmlFile.getValue("A", -1.0);
-                
                 double valR = xmlFile.getValue("R", -1.0);
-                
                 double valG = xmlFile.getValue("G", -1.0);
-                
                 double valB = xmlFile.getValue("B", -1.0);
                 
                 xmlFile.popTag(); //ObjectColor
                 
                 push = xmlFile.pushTag("Points");
-    //            if (push) printf("Points OK\n");
                 
                 int numPts = xmlFile.getNumTags("Point");
-    //            printf("num points read in line = %i\n", numPts);
                 
                 //save line data into structure
                 VuzikXML line;
                 line.init(numPts, line_w, valA, valR, valG, valB);
-                
-                //vuzikLines[l].init(numPts, line_w, valA, valR, valG, valB);
                 
                 if (numPts>0) {
                     for (int i=0; i<numPts; i++) {
@@ -217,12 +204,10 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
                 }
                 xmlFile.popTag(); // Points
                 
-                
                 xmlFile.popTag(); //PolyLine
+
                 //add line to list
                 vuzikLines.push_back(line);
-                
-                
             }
             xmlFile.popTag(); //graphics
             xmlFile.popTag(); //graphics
@@ -239,10 +224,7 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
         
         x_in_max+=x_max; //increment total time (combined offset)
         maxTime+=x_max/100.0;
-        printf("maxTime increased to  %lf\n",maxTime);
-        
     }
-    
     printf("total lines read = %li\n", totalLines);
     
     startList.resize( totalLines );
@@ -252,21 +234,11 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
     printf("x_max = %lf\n",x_in_max);
     printf("x_min = %lf\n",x_in_min);
     
-
-    
     for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
         //printf("adding line %li\n",id);
         
         (*t) = new BreakPointFunction();
         
-        // <CRAP>
-        
-        // Here we fill the BPF using the addSetSet() ( = good ) but the sets
-        // are made out of incremental random data and times. At this point, the
-        // Vuzik XML file should be parsed, a arbitrary time base defined, and
-        // the data sets added as to respect the ordering of the painting
-        // which is probably the ordering in the XML file anyway
-
         (*t)->a = vuzikLines[id-1].alpha;
         (*t)->r = vuzikLines[id-1].red;
         (*t)->g = vuzikLines[id-1].green;
@@ -294,9 +266,6 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
             dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
             dataSet.time = 0.5+(vuzikLines[id-1].getX(k))*maxTime/(x_in_max);
-            
-            //printf("t= %lf\n",dataSet.time);
-            
         }
     }
     
@@ -307,8 +276,7 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
     
-    //scoreMaxTime = 210.0f;
-    scoreMaxTime += 2.0f; // trick to add some room at the end
+    scoreMaxTime += 2.0f; // add some room at the end
     
 }
 
