@@ -187,9 +187,24 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
         double y_min = DBL_MAX;
         double y_max = DBL_MIN;
         
+        int current_scale = 0;
+        
         bool push = xmlFile.pushTag("Graphics",s);
         
         if (push) printf("score # %i OK\n", s);
+        
+        string scale = xmlFile.getValue("MusicScale", "scale");
+        //        printf("scale= %s\n",scale.c_str());
+        current_scale = -1;
+        if (scale.compare("WholeTone") == 0) {
+            printf("WholeTone scale\n");
+            current_scale = 5;
+        }
+        if (scale.compare("Chromatic") == 0) {
+            printf("Chromatic scale\n");
+            current_scale = 7;
+        }
+        
         push = xmlFile.pushTag("Graphics");
         //if (push) printf("OK\n");
         int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
@@ -223,6 +238,7 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
                 //save line data into structure
                 VuzikXML line;
                 line.init(numPts, line_w, valA, valR, valG, valB);
+                line.setScale(current_scale);
                 
                 if (numPts>0) {
                     for (int i=0; i<numPts; i++) {
@@ -256,10 +272,10 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
             printf("x_offset pushed to %lf\n",x_offset);
             
         }
-        //!!!! NOTE: this 100.0 is a tuning factor
-        
+        // NOTE: 1000pixels = 13.365 seconds
+        // 1000/13.365 = 74.8222
         x_in_max+=x_max; //increment total time (combined offset)
-        maxTime+=x_max/100.0;
+        maxTime+=x_max/74.8222;
     }
     printf("total lines read = %li\n", totalLines);
     
@@ -286,6 +302,8 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
         
         dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0; //convert to 0.1-1.0
         
+        dataSet.scale = vuzikLines[id-1].getScale();
+        
         bool crazy = false;;
         if (dataSet.velocity == 1.0) crazy = true;
         
@@ -305,6 +323,7 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
             dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
             dataSet.time = 0.5+(vuzikLines[id-1].getX(k))*maxTime/(x_in_max);
+            dataSet.scale = vuzikLines[id-1].getScale();
         }
     }
     

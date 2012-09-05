@@ -75,4 +75,6 @@ class testApp : public ofBaseApp {
     
     bool showSplashScreen;
     ofImage splashScreen;
+    
+    int currentScale;
 };

@@ -25,6 +25,7 @@ void testApp::setup( void ) {
     
     splashScreen.loadImage( "splash.png" );
     showSplashScreen = true; // splash
+    currentScale = -1;
     
     fullScreen = false;
     playAsLoop = false;
@@ -277,6 +278,17 @@ void testApp::sendTouchedAsOscMessages( void ) {
         message.addIntArg( tTouched[k].state );
         
         oscSender.sendMessage( message );
+        if (tTouched[k].data.getScale() != currentScale) {
+            currentScale = tTouched[k].data.getScale();
+            message.clear();
+            message.setAddress( "/scale#" );
+            message.addIntArg(currentScale);
+            oscSender.sendMessage(message);
+            oscSender.sendMessage(message);
+            oscSender.sendMessage(message);
+            printf("changed scale to %i\n",currentScale);
+            
+        }
     }
 }
 

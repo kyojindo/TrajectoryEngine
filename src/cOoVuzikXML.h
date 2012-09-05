@@ -28,10 +28,12 @@ namespace cOo {
         
         void setX(double val, long idx) {X[idx] = val;}
         void setY(double val, long idx) {Y[idx] = val;}
+        void setScale(int sc) {scale = sc;}
         
         double getX(long idx) {return X[idx];}
         double getY(long idx) {return Y[idx];}
         double getPitch(long idx);
+        int getScale(void) {return scale;}
         
         double getLineWidth() {return lineWidth;}
         
@@ -53,6 +55,7 @@ namespace cOo {
         double* Y;
         
         double lineWidth;
+        int scale;
         
 
     };
