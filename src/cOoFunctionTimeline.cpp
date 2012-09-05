@@ -312,18 +312,15 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
         // set the BPF properties
         (*t)->setProperties( id, lineType, crazy );
         
-        
-        
         dataSet.time = 0.5+(vuzikLines[id-1].getX(0))*maxTime/(x_in_max);
         
         for( long k=0; k<bpfSize; k++ ) {
-            
-            (*t)->addDataSet( dataSet );
             
             dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
             dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
             dataSet.time = 0.5+(vuzikLines[id-1].getX(k))*maxTime/(x_in_max);
             dataSet.scale = vuzikLines[id-1].getScale();
+            (*t)->addDataSet( dataSet );
         }
     }
     

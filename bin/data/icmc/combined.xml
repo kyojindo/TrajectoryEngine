@@ -85990,3 +85990,42 @@
   <MusicScale>WholeTone</MusicScale>
   <PlaybackTempo>6.8336673346693386</PlaybackTempo>
 </Graphics>
+
+<?xml version="1.0"?>
+<Graphics xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Graphics>
+    <PropertiesGraphicsPolyLine>
+        <Points>
+            <Point>
+                <X>20.5370423303123</X>
+                <Y>387.47655488370685</Y>
+            </Point>
+            <Point>
+                <X>21</X>
+                <Y>399.99844603268343</Y>
+            </Point>
+            <Point>
+                <X>23.4932600323589</X>
+                <Y>381.91126992860609</Y>
+            </Point>
+            <Point>
+                <X>24.1019387935837</X>
+                <Y>388.867876122482</Y>
+            </Point>
+        </Points>
+        <LineWidth>1.101123595505618</LineWidth>
+        <ObjectColor>
+            <A>255</A>
+            <R>168</R>
+            <G>0</G>
+            <B>51</B>
+            <ScA>1</ScA>
+            <ScR>0.391572475</ScR>
+            <ScG>0</ScG>
+            <ScB>0.0331047662</ScB>
+        </ObjectColor>
+    </PropertiesGraphicsPolyLine>
+  </Graphics>
+  <MusicScale>Chromatic</MusicScale>
+  <PlaybackTempo>6.8336673346693386</PlaybackTempo>
+</Graphics>
