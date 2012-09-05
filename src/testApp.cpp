@@ -18,9 +18,8 @@ void testApp::setup( void ) {
     fullScreen = false;
     playAsLoop = false;
     
-    showSplashScreen = true;
-    
     splashScreen.loadImage("splash.png");
+    showSplashScreen = true;
 }
 
 void testApp::exit( void ) {
@@ -49,12 +48,14 @@ void testApp::update( void ) {
 
 void testApp::draw( void ) {
     
-    if (showSplashScreen) {
+    if( showSplashScreen ) {
+        
         int x = ofGetWidth()/2 - splashScreen.width/2;
         int y = ofGetHeight()/2 - splashScreen.height/2;
-        splashScreen.draw(x, y);
-    }
-    else {
+        
+        splashScreen.draw( x, y );
+        
+    } else {
     
         nOfVisible = 0;
         list<SketchedCurve>::iterator skc;
@@ -128,8 +129,6 @@ void testApp::draw( void ) {
             screenMapper.getTimefromX( ofGetWidth()/2 ) ) );
             playbackAccess.unlock();
         }
-        
-        ofDrawBitmapString( ofToString( nOfVisible ), 20, 60 );
     }
 }
 
@@ -170,8 +169,10 @@ void testApp::moveTimeline( Time shift ) {
 
 void testApp::startPlayback( void ) {
 
+    showSplashScreen = false;
+    
     if( !timer.isRunning() ) {
-        showSplashScreen = false;
+        
         timer.start();
     }
 }
