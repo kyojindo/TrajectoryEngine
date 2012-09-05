@@ -10,6 +10,11 @@ double &cOo::DataSet::getVelocity( void ) {
     return( velocity );
 }
 
+int &cOo::DataSet::getScale( void ) {
+    
+    return( scale );
+}
+
 void cOo::DataSet::set( double dataPitch, double dataVelocity ) {
 
     velocity = dataVelocity;
@@ -24,7 +29,7 @@ cOo::DataSet cOo::DataSet::interpolate( DataSet &data, double factor ) {
     result.velocity = factor * data.velocity + (1.0f-factor) * velocity;
     result.pitch = factor * data.pitch + (1.0f-factor) * pitch;
     result.time = factor * data.time + (1.0f-factor) * time;
-    result.scale = data.getScale();
+    result.scale = data.scale; // just transfer the scale
     
     return( result );
 }
