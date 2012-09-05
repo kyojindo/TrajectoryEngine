@@ -244,17 +244,20 @@ void cOo::FunctionTimeline::loadVuzikFile(string filename) {
         (*t)->g = vuzikLines[id-1].green;
         (*t)->b = vuzikLines[id-1].blue;
         
-        int lineType =VuzikXML::parseVuzikLineType(vuzikLines[id-1].red);
-        
-        // set the BPF properties
-        (*t)->setProperties( id, lineType, false );
-
-        
         bpfSize = vuzikLines[id-1].getSize();
         
         dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(0));
         
-        dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
+        dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0; //convert to 0.1-1.0
+        
+        bool crazy = false;;
+        if (dataSet.velocity == 1.0) crazy = true;
+        
+        int lineType =VuzikXML::parseVuzikLineType(vuzikLines[id-1].red);
+        
+        // set the BPF properties
+        (*t)->setProperties( id, lineType, crazy );
+
         
         
         dataSet.time = 0.5+(vuzikLines[id-1].getX(0))*maxTime/(x_in_max);
