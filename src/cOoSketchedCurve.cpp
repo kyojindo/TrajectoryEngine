@@ -24,27 +24,30 @@ void cOo::SketchedCurve::generate( void ) {
     ofClear( 255, 255, 255, 0 );
     glEnable( GL_LINE_SMOOTH ); glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glHint( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
+    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
         
-    for( int k=0; k<16; k++ ) {
+    for( int k=0; k<8; k++ ) {
     
         path.clear();
         path.setFilled( false );
-        path.setStrokeWidth( 1.8f );
+        path.setStrokeWidth( 2.0f );
         
-        float rSat = ofRandom( 150, 200 );
-        float rAlpha = ofRandom( 20, 240 );
+        float rSat = ofRandom( 150, 220 );
+        float rAlpha = ofRandom( 50, 220 );
+        
+        float rHue = colorMap.get( bpf->getType() );
+        if( rHue < 0.0f ) { rSat = 0.0f; }
         
         bool drawOnce = false;
         
-        color.setHsb( colorMap.get( bpf->getType() ), rSat, 255, rAlpha );
+        color.setHsb( rHue, rSat, 250, rAlpha );
         
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
 
             if( !bpf->isCrazy() ) radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
-            else radius = ofMap( record.data.getVelocity(), 0, 1, 0, 10 ) + ofRandom( -60, 60 );
+            else radius = ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
             
             if( k == 0 ) {
                 radius = 0.1;

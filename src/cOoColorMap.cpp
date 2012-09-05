@@ -2,9 +2,14 @@
 
 cOo::ColorMap::ColorMap( void ) {
 
-    map.push_back( 292.0f ); map.push_back( 28.0f );
-    map.push_back( 61.0f ); map.push_back( 106.0f );
-    map.push_back( 193.0f ); map.push_back( 0.0f );
+    map.push_back( 300.0f );
+    map.push_back( 000.0f );
+    map.push_back( 025.0f );
+    map.push_back( 058.0f );
+    map.push_back( 113.0f );
+    map.push_back( 195.0f );
+    map.push_back( 240.0f );
+    map.push_back( -10.0f );
 }
 
 float cOo::ColorMap::get( int index ) {

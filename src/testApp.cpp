@@ -5,12 +5,12 @@ void testApp::setup( void ) {
     list<SketchedCurve>::iterator skc;
     list<BreakPointFunction *>::iterator bpf;
     
-    ofEnableAlphaBlending(); ofEnableSmoothing();
+    //ofEnableAlphaBlending();
+    
     ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
     
-    //timeline.generate( 180.0f ); // generate a random score of given time
-    //timeline.loadMidiImport();
-    timeline.loadVuzikFile("icmc/combined.xml");
+    //timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
+    timeline.loadVuzikFile( "mycalibration.xml" ); // import the Vuzik files
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     
@@ -24,7 +24,7 @@ void testApp::setup( void ) {
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     splashScreen.loadImage( "splash.png" );
-    showSplashScreen = true;
+    showSplashScreen = true; // splash
     
     fullScreen = false;
     playAsLoop = false;
@@ -56,19 +56,18 @@ void testApp::update( void ) {
 
 void testApp::draw( void ) {
     
+    list<SketchedCurve>::iterator skc;
+    
+    glEnable( GL_LINE_SMOOTH ); glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    
     if( showSplashScreen ) {
         
         int x = ofGetWidth()/2 - splashScreen.width/2;
         int y = ofGetHeight()/2 - splashScreen.height/2;
-        
-        splashScreen.draw( x, y );
+        splashScreen.draw( x, y ); // show splash screen
         
     } else {
-        
-        list<SketchedCurve>::iterator skc;
-        
-        glEnable( GL_BLEND ); // GL options are resent at draw
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
         
         for( int k=0; k<nOfSemitones; k++ ) {
         
@@ -84,7 +83,7 @@ void testApp::draw( void ) {
         while( secLoc < ofGetWidth() ) {
         
             secLoc = screenMapper.getXfromTime( secVal );
-            secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 10 );
+            secVal = secVal + 1.0f; ofSetColor( 255, 255, 255, 20 );
             ofSetLineWidth( 2 ); ofLine( secLoc, 0, secLoc, ofGetHeight() );
         }
         
