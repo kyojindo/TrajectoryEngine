@@ -10,7 +10,7 @@ void testApp::setup( void ) {
     ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
     
     //timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
-    timeline.loadVuzikFile( "mycalibration.xml" ); // import the Vuzik files
+    timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
     
