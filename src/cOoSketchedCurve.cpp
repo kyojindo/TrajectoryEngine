@@ -32,13 +32,13 @@ void cOo::SketchedCurve::generate( void ) {
         path.setFilled( false );
         path.setStrokeWidth( 2.0f );
         
-        float rSat = ofRandom( 150, 220 );
-        float rAlpha = ofRandom( 50, 220 );
-        
-        float rHue = colorMap.get( bpf->getType() );
-        if( rHue < 0.0f ) { rSat = 0.0f; }
-        
         bool drawOnce = false;
+        
+        float rAlpha = ofRandom( 50, 220 ); float rSat;
+        float rHue = colorMap.get( bpf->getType() );
+        
+        if( rHue < 0.0f ) rSat = 0.0f;
+        else rSat = ofRandom( 150, 220 );
         
         color.setHsb( rHue, rSat, 250, rAlpha );
         
@@ -61,10 +61,8 @@ void cOo::SketchedCurve::generate( void ) {
                 
             if( k == bpf->getSize()-1 ) radius = 0.1;
             
-                
-            
-            pitch = ofMap( record.data.getPitch(), 0, 33,
-            ofGetHeight(), 0 ) + ofRandom( -radius, radius );
+            pitch = ofMap( record.data.getPitch(), VUZIK_PITCH_MIN,
+            VUZIK_PITCH_MAX, ofGetHeight(), 0 ) + ofRandom( -radius, radius );
             
             time = ( screenMapper->getXfromTime( record.data.time ) -
             screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
@@ -76,13 +74,13 @@ void cOo::SketchedCurve::generate( void ) {
                 drawOnce = true; //stop drawing more lines on future passes
                 path.setStrokeWidth(0.0 ); //don't draw any lines...
                 if (k%2) {
-                    color.setHsb( colorMap.get( bpf->getType() ), 255, 255, 255 );
+                    color.setHsb( colorMap.get( bpf->getType() ), 255, 255, 200 );
                     ofSetColor(color);
 
                     //ofFill();
                     //ofSetCircleResolution(64);
                     //ofCircle(time+64, pitch, radius*2.0);
-                    ofEnableSmoothing();
+                    //ofEnableSmoothing();
                     ofNoFill();
                     ofSetCircleResolution(32);
                     ofCircle(time+64, pitch, radius*2.0);

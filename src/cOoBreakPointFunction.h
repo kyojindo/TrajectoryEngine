@@ -56,11 +56,6 @@ namespace cOo {
         
         void print( void );
         
-        int a;
-        int r;
-        int g;
-        int b;
-        
       protected:
         
         list<Record> record;        

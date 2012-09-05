@@ -3,6 +3,7 @@
 
 #include "cOoScreenMapper.h"
 #include "cOoBreakPointFunction.h"
+#include "cOoVuzikXML.h"
 #include "cOoColorMap.h"
 
 #include "ofMain.h"

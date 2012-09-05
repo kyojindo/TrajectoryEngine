@@ -160,170 +160,140 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
     
     Time maxTime = 0.0;
     long bpfSize;
-    long id = 1;
+    long id = 0;
     double startTime;
     DataSet dataSet;
     ofxXmlSettings xmlFile;
     vector <VuzikXML> vuzikLines;
     
-    if (xmlFile.loadFile(filename)){
-		printf("%s loaded!\n", filename.c_str());
-	}else{
-		printf("unable to load %s check data/ folder\n", filename.c_str());
-	}
-    int numCombinedScores = xmlFile.getNumTags("Graphics");
-    printf("num scores = %i\n", numCombinedScores);
-    
-    long totalLines = 0;
-    double x_offset = 0.0;
-    
-    x_in_min = 0;
-    x_in_max = DBL_MIN;
-    
-    for (int s=0; s<numCombinedScores; s++) {
+    if( !xmlFile.loadFile( filename ) ) {
         
-        double x_min = 0;
-        double x_max = DBL_MIN;
-        double y_min = DBL_MAX;
-        double y_max = DBL_MIN;
+        printf( "unable to load %s\n", filename.c_str() );
+    }
+    
+    int nOfCombinedScores = xmlFile.getNumTags( "Graphics" );
+    printf( "nOfCombinedScores: %i\n", nOfCombinedScores );
+    
+    long totalLines = 0; double x_offset = 0.0;
+    
+    x_in_min = 0; x_in_max = DBL_MIN;
+    
+    for( int s=0; s<nOfCombinedScores; s++ ) {
+        
+        double x_min = 0; double x_max = DBL_MIN;
+        double y_min = DBL_MAX; double y_max = DBL_MIN;
         
         int current_scale = 0;
         
-        bool push = xmlFile.pushTag("Graphics",s);
+        if( !xmlFile.pushTag( "Graphics", s ) ) {
         
-        if (push) printf("score # %i OK\n", s);
+            printf( "we could not enter score %i\n", s );
+        }
         
-        string scale = xmlFile.getValue("MusicScale", "scale");
-        //        printf("scale= %s\n",scale.c_str());
+        string scale = xmlFile.getValue( "MusicScale", "scale" );
+        
         current_scale = -1;
-        if (scale.compare("WholeTone") == 0) {
-            printf("WholeTone scale\n");
-            current_scale = 5;
-        }
-        if (scale.compare("Chromatic") == 0) {
-            printf("Chromatic scale\n");
-            current_scale = 7;
-        }
         
-        push = xmlFile.pushTag("Graphics");
-        //if (push) printf("OK\n");
-        int numLines = xmlFile.getNumTags("PropertiesGraphicsPolyLine");
-        printf("num polyLines read in data = %i\n", numLines);
+        if( scale.compare("WholeTone") == 0 ) current_scale = 5;
+        if( scale.compare("Chromatic") == 0 ) current_scale = 7;
         
-        if (numLines > 0) {
-            //only parse the file if there is at least one line tag
+        xmlFile.pushTag("Graphics");
+        
+        int numLines = xmlFile.getNumTags( "PropertiesGraphicsPolyLine" );
+        
+        if( numLines > 0 ) {
             
-            for(long l=0; l<numLines; l++) {
+            for( long l=0; l<numLines; l++ ) {
                 
-                push = xmlFile.pushTag("PropertiesGraphicsPolyLine", l);
-                //           if (push) printf("loading polyLine %li...  ", l);
-                double line_w = xmlFile.getValue("LineWidth", -1.0);
-                //           printf("line_w = %f\n",line_w);
+                xmlFile.pushTag( "PropertiesGraphicsPolyLine", l );
+                double line_w = xmlFile.getValue( "LineWidth", -1.0 );
                 
-                //load line color
+                xmlFile.pushTag( "ObjectColor" );
                 
-                push = xmlFile.pushTag("ObjectColor");
+                double valA = xmlFile.getValue( "A", -1.0 );
+                double valR = xmlFile.getValue( "R", -1.0 );
+                double valG = xmlFile.getValue( "G", -1.0 );
+                double valB = xmlFile.getValue( "B", -1.0 );
                 
-                double valA = xmlFile.getValue("A", -1.0);
-                double valR = xmlFile.getValue("R", -1.0);
-                double valG = xmlFile.getValue("G", -1.0);
-                double valB = xmlFile.getValue("B", -1.0);
+                xmlFile.popTag(); // ObjectColor
                 
-                xmlFile.popTag(); //ObjectColor
+                xmlFile.pushTag("Points");
                 
-                push = xmlFile.pushTag("Points");
+                int numPts = xmlFile.getNumTags( "Point" );
                 
-                int numPts = xmlFile.getNumTags("Point");
+                VuzikXML line; // save line data into structure
+                line.init( numPts, line_w, valA, valR, valG, valB );
+                line.setScale( current_scale );
                 
-                //save line data into structure
-                VuzikXML line;
-                line.init(numPts, line_w, valA, valR, valG, valB);
-                line.setScale(current_scale);
-                
-                if (numPts>0) {
-                    for (int i=0; i<numPts; i++) {
-                        double x = xmlFile.getValue("Point:X", 0.0, i);
-                        double y = xmlFile.getValue("Point:Y", 0.0, i);
-                        if (x>x_max) x_max = x;
-                        //if (x<x_min) x_min = x;
-                        if (y>y_max) y_max = y;
-                        if (y<y_min) y_min = y;
+                if( numPts > 0 ) {
+                    
+                    for( int i=0; i<numPts; i++ ) {
                         
-                        line.setX(x+x_offset, i);
-                        line.setY(y, i);
-                        //printf("x:y = %f:%f\n", x,y);
+                        double x = xmlFile.getValue( "Point:X", 0.0, i );
+                        double y = xmlFile.getValue( "Point:Y", 0.0, i );
+                        
+                        if( x > x_max ) x_max = x; if ( x < x_min ) x_min = x;
+                        if( y > y_max ) y_max = y; if ( y < y_min ) y_min = y;
+                        
+                        line.setX( x+x_offset, i ); line.setY( y, i );
                     }
                 }
-                xmlFile.popTag(); // Points
                 
-                xmlFile.popTag(); //PolyLine
+                xmlFile.popTag(); // Points
+                xmlFile.popTag(); // PolyLine
                 
                 //add line to list
-                vuzikLines.push_back(line);
+                vuzikLines.push_back( line );
             }
-            xmlFile.popTag(); //graphics
-            xmlFile.popTag(); //graphics
             
-            printf("x_min x_max: %f %f\n", x_min, x_max);
-            printf("y_min y_max: %f %f\n", y_min, y_max);
-            totalLines+= numLines;
+            xmlFile.popTag(); // Graphics
+            xmlFile.popTag(); // Graphics
             
-            x_offset+= x_max; //increment begin time
-            printf("x_offset pushed to %lf\n",x_offset);
+            printf( "x_min x_max: %f %f\n", x_min, x_max );
+            printf( "y_min y_max: %f %f\n", y_min, y_max );
+            
+            totalLines += numLines;
+            
+            x_offset += x_max; // increment begin time
+            printf( "x_offset pushed to %lf\n", x_offset );
             
         }
-        // NOTE: 1000pixels = 13.365 seconds
-        // 1000/13.365 = 74.8222
-        x_in_max+=x_max; //increment total time (combined offset)
-        maxTime+=x_max/74.8222;
+        
+        // NOTE: 1000pixels = 13.365 seconds -> 1000/13.365 = 74.8222
+        x_in_max += x_max; // increment total time (combined offset)
+        maxTime += x_max/74.8222; // ----------------------------
     }
+    
     printf("total lines read = %li\n", totalLines);
     
     startList.resize( totalLines );
     stopList.resize( totalLines );
     scoreMaxTime = maxTime;
     
-    printf("x_max = %lf\n",x_in_max);
-    printf("x_min = %lf\n",x_in_min);
+    printf( "x_max = %lf\n", x_in_max );
+    printf( "x_min = %lf\n", x_in_min );
     
     for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
-        //printf("adding line %li\n",id);
         
         (*t) = new BreakPointFunction();
+        bpfSize = vuzikLines[id].getSize();
         
-        (*t)->a = vuzikLines[id-1].alpha;
-        (*t)->r = vuzikLines[id-1].red;
-        (*t)->g = vuzikLines[id-1].green;
-        (*t)->b = vuzikLines[id-1].blue;
+        dataSet.velocity = vuzikLines[id].getLineWidth() / 10.0;
+        bool crazy = false; if( dataSet.velocity == 1.0 ) crazy = true;
         
-        bpfSize = vuzikLines[id-1].getSize();
-        
-        dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(0));
-        
-        dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0; //convert to 0.1-1.0
-        
-        dataSet.scale = vuzikLines[id-1].getScale();
-        
-        bool crazy = false;;
-        if (dataSet.velocity == 1.0) crazy = true;
-        
-        int lineType =VuzikXML::parseVuzikLineType(vuzikLines[id-1].red);
-        
-        // set the BPF properties
-        (*t)->setProperties( id, lineType, crazy );
-        
-        dataSet.time = 0.5+(vuzikLines[id-1].getX(0))*maxTime/(x_in_max);
+        int lineType = VuzikXML::parseVuzikLineType( vuzikLines[id].red );
+        (*t)->setProperties( id, lineType, crazy ); // set the BPF properties
         
         for( long k=0; k<bpfSize; k++ ) {
             
-            dataSet.pitch = tempPitchConverter(vuzikLines[id-1].getY(k));
-            dataSet.velocity = vuzikLines[id-1].getLineWidth()/10.0;
-            dataSet.time = 0.5+(vuzikLines[id-1].getX(k))*maxTime/(x_in_max);
-            dataSet.scale = vuzikLines[id-1].getScale();
+            dataSet.scale = vuzikLines[id].getScale();
+            dataSet.velocity = vuzikLines[id].getLineWidth() / 10.0;
+            dataSet.pitch = vuzikPitchMapping( vuzikLines[id].getY(k) );
+            dataSet.time = 0.5 + ( vuzikLines[id].getX(k) ) * maxTime/( x_in_max );
+            
             (*t)->addDataSet( dataSet );
         }
     }
-    
     
     // sort startList by startTime order ( using overladed predicate )
     startList.sort( cOo::BreakPointFunction::startTimeSortPredicate );
@@ -331,14 +301,14 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
     
-    scoreMaxTime += 2.0f; // add some room at the end
+    scoreMaxTime += 20.0f; // add some room at the end
     
 }
 
 // --- fill the timeline with a MIDI score ---
-void cOo::FunctionTimeline::loadMidiImport( void ) {
+void cOo::FunctionTimeline::loadMidiFile( string filename ) {
     
-    ofBuffer file = ofBufferFromFile("midi_import2.txt");
+    ofBuffer file = ofBufferFromFile( filename );
     string line;
     
     MIDITextTrack voices[NUM_MIDI_VOICES];
@@ -649,7 +619,8 @@ void cOo::FunctionTimeline::print( void ) {
     for( t=stopList.begin(); t!=stopList.end(); ++t ) (*t)->print();
 }
 
-double cOo::FunctionTimeline::tempPitchConverter(double in_p) {
+double cOo::FunctionTimeline::vuzikPitchMapping( double in_p ) {
     
-    return VUZIK_PITCH_MIN + (VUZIK_Y_MAX-in_p)*(VUZIK_PITCH_MAX-VUZIK_PITCH_MIN)/(VUZIK_Y_MAX-VUZIK_Y_MIN);
+    return( VUZIK_PITCH_MIN + ( VUZIK_Y_MAX - in_p ) * ( VUZIK_PITCH_MAX
+    - VUZIK_PITCH_MIN ) / ( VUZIK_Y_MAX - VUZIK_Y_MIN ) ); // map map
 }
