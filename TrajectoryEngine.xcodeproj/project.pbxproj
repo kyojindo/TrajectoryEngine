@@ -325,10 +325,10 @@
 		9FC1F84515DA73A400D91E9F /* Import */ = {
 			isa = PBXGroup;
 			children = (
-				D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */,
-				D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */,
 				53E5E6A215EDCD8E00DEAD69 /* cOoMIDITextTrack.cpp */,
 				53E5E6A315EDCD8E00DEAD69 /* cOoMIDITextTrack.h */,
+				D59B777715D9AACD00DFBF18 /* cOoVuzikXML.cpp */,
+				D59B777515D9A70700DFBF18 /* cOoVuzikXML.h */,
 			);
 			name = Import;
 			sourceTree = "<group>";

@@ -72,4 +72,7 @@ class testApp : public ofBaseApp {
     ofxOscReceiver oscReceiver; // OSC receiver
     ofxOscSender oscSender; // OSC sender
     ofxOscMessage message; // message
+    
+    bool showSplashScreen;
+    ofImage splashScreen;
 };

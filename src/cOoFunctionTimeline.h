@@ -35,11 +35,10 @@ namespace cOo {
         FunctionTimeline( void );
         ~FunctionTimeline( void );
         
-        void loadVuzikFile(string filename);
-        
-        void loadMidiImport();
-        
         void generate( Time maxTime );
+        void loadVuzikFile( string filename );
+        void loadMidiImport( void );
+        void clear( void );
         
         void activateFrom( long fromIndex, Time &time );
         void deactivateFrom( long fromIndex, Time &time );
@@ -65,18 +64,14 @@ namespace cOo {
         long startHead, stopHead; // saved playback heads
         Time scoreMaxTime; // maximum score duration
         
-        
         //[TODO: figure out pitch mapping strategy]
         double tempPitchConverter(double in_pitch);
-        double pitch_in_min;
-        double pitch_in_max;
-        double pitch_out_min;
-        double pitch_out_max;
+        double pitch_out_min; double pitch_out_max;
+        double pitch_in_min; double pitch_in_max;
         
-        //[TODO: add protocol for inputting time settings: how much gap to put before/end, set piece duration, etc]
-        double x_in_min;
-        double x_in_max;
-        
+        //[TODO: add protocol for inputting time settings: how
+        // much gap to put before/end, set piece duration, etc]
+        double x_in_min; double x_in_max;
     };
 }
 

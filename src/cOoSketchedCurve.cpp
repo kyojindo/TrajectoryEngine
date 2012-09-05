@@ -26,11 +26,11 @@ void cOo::SketchedCurve::generate( void ) {
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glHint( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
         
-    for( int k=0; k<12; k++ ) {
+    for( int k=0; k<16; k++ ) {
     
         path.clear();
         path.setFilled( false );
-        path.setStrokeWidth( 1.5f );
+        path.setStrokeWidth( 1.8f );
         
         float rSat = ofRandom( 150, 200 );
         float rAlpha = ofRandom( 20, 240 );
@@ -97,6 +97,11 @@ void cOo::SketchedCurve::generate( void ) {
     }
     
     fbo->end();
+}
+
+void cOo::SketchedCurve::destroy( void ) {
+    
+    
 }
 
 void cOo::SketchedCurve::draw( void ) {
