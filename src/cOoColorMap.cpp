@@ -4,7 +4,7 @@ cOo::ColorMap::ColorMap( void ) {
     
     map.push_back( 315.0f ); // PINK
     map.push_back( 000.0f ); // RED
-    map.push_back( 035.0f ); // ORANGE
+    map.push_back( 025.0f ); // ORANGE
     map.push_back( 058.0f ); // YELLOW
     map.push_back( 140.0f ); // GREEN
     map.push_back( 195.0f ); // LIGHT_BLUE

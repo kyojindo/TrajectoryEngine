@@ -26,7 +26,7 @@ void testApp::setup( void ) {
     oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
     
-    zoomFactor = 1.0f; // set zoom factor to default
+    zoomFactor = 1.5f; // set zoom factor to default
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     splashScreen.loadImage( "splash.png" );
