@@ -23,15 +23,15 @@ void testApp::setup( void ) {
     for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
     bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
     
-    //oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
-    oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
+    oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
+    //oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
     
     zoomFactor = 1.5f; // set zoom factor to default
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     splashScreen.loadImage( "splash.png" );
-    showSplashScreen = true; // splash scr
+    showSplashScreen = false; // splash scr
     
     fullScreen = false;
     playAsLoop = false;
