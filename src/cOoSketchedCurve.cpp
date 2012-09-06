@@ -17,7 +17,6 @@ void cOo::SketchedCurve::generate( void ) {
     if ( (type == 0) || (type == 2) || (type == 5) ) {
         isChoirMob = true;
     }
-    printf("type= %i\n",type);
     
     fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() )
     * screenMapper->getPixelPerSec() + 128.0f;
@@ -52,10 +51,6 @@ void cOo::SketchedCurve::generate( void ) {
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
-            /*
-            if( !bpf->isCrazy() ) radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
-            else radius = 20; //ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
-             */
             
             //hairy cases
             if ( (isChoirMob && (record.data.velocity > 0.995)) || (!isChoirMob && record.data.velocity < 0.105) ) {
@@ -65,12 +60,9 @@ void cOo::SketchedCurve::generate( void ) {
             else {
                 radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
             }
-             
-             
-            
+           
             if( k == 0 ) {
                 radius = 0.1;
-                //path.setStrokeWidth(record.data.getVelocity()*2.0+2.0);
             }
             
             if( k == bpf->getSize()-1 ) radius = 0.1;
@@ -88,7 +80,6 @@ void cOo::SketchedCurve::generate( void ) {
                 if (record.data.velocity < 0.105){
                     //choirmob: thin = dotted
                     drawOnce = true; //stop drawing more lines on future passes
-                    //path.setStrokeWidth(0.0 ); //don't draw any lines...
                     if (1) {
                         //set constant alpha for dots
                         color.setHsb( rHue, 255, 250, 255 );
