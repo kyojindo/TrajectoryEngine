@@ -12,6 +12,13 @@ void cOo::SketchedCurve::generate( void ) {
     float radius, pitch, time;
     Record record; ofPath path; ofColor color;
     
+    bool isChoirMob = false;
+    int type = bpf->getType();
+    if ( (type == 0) || (type == 2) || (type == 5) ) {
+        isChoirMob = true;
+    }
+    printf("type= %i\n",type);
+    
     fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() )
     * screenMapper->getPixelPerSec() + 128.0f;
     fboHeight = ofGetHeight();
@@ -30,7 +37,7 @@ void cOo::SketchedCurve::generate( void ) {
     
         path.clear();
         path.setFilled( false );
-        path.setStrokeWidth( 2.0f );
+        path.setStrokeWidth( 1.5f );
         
         bool drawOnce = false;
         
@@ -45,20 +52,27 @@ void cOo::SketchedCurve::generate( void ) {
         for( long k=0; k<bpf->getSize(); k++ ) {
             
             bpf->getRecord( k, record );
-
+            /*
             if( !bpf->isCrazy() ) radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
-            else radius = ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
+            else radius = 20; //ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
+             */
+            
+            //hairy cases
+            if ( (isChoirMob && (record.data.velocity > 0.995)) || (!isChoirMob && record.data.velocity < 0.105) ) {
+                radius = ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
+                
+            }
+            else {
+                radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
+            }
+             
+             
             
             if( k == 0 ) {
                 radius = 0.1;
                 //path.setStrokeWidth(record.data.getVelocity()*2.0+2.0);
             }
             
-            if (record.data.velocity == 0.1) {
-                drawOnce = true; //stop drawing more lines on future passes
-                path.setStrokeWidth(0.0 ); //don't draw any lines...
-            }
-                
             if( k == bpf->getSize()-1 ) radius = 0.1;
             
             pitch = ofMap( record.data.getPitch(), VUZIK_PITCH_MIN,
@@ -70,31 +84,45 @@ void cOo::SketchedCurve::generate( void ) {
             if( k==0 ) path.moveTo( time+64, pitch );
             else path.curveTo( time+64, pitch );
             
-            if (record.data.velocity == 0.1) {
-                drawOnce = true; //stop drawing more lines on future passes
-                path.setStrokeWidth(0.0 ); //don't draw any lines...
-                if (k%2) {
-                    color.setHsb( colorMap.get( bpf->getType() ), 255, 255, 200 );
-                    ofSetColor(color);
-
-                    //ofFill();
-                    //ofSetCircleResolution(64);
-                    //ofCircle(time+64, pitch, radius*2.0);
-                    //ofEnableSmoothing();
-                    ofNoFill();
-                    ofSetCircleResolution(32);
-                    ofCircle(time+64, pitch, radius*2.0);
+            if (isChoirMob) {
+                if (record.data.velocity < 0.105){
+                    //choirmob: thin = dotted
+                    drawOnce = true; //stop drawing more lines on future passes
+                    //path.setStrokeWidth(0.0 ); //don't draw any lines...
+                    if (1) {
+                        //set constant alpha for dots
+                        color.setHsb( rHue, 255, 250, 255 );
+                        ofFill();
+                        ofSetColor(color);
+                        ofSetCircleResolution(32);
+                        ofCircle(time+64, pitch, 2.0);
+                    }
                 }
             }
+            else { //MIXED PHASE
+                //Mixed phase: thick = bubbles
+                if (record.data.velocity > 0.995) {
+                    drawOnce = true;
+                    radius = ofMap( record.data.getVelocity(), 0, 1, 2.0, 5.0 ) + ofRandom( -2, 2 );
+                    //set constant alpha for bubbles
+                    color.setHsb( rHue, 255, 250, 255 );
+                    ofNoFill();
+                    ofEnableSmoothing();
+                    ofSetColor(color);
+                    ofSetCircleResolution(64);
+                    ofCircle(time+64, pitch, radius);
+                }
+            }
+            
+            
         }
         if (drawOnce) break;
         else {
+            color.setHsb( colorMap.get( bpf->getType() ), rSat, 255, rAlpha );
             path.curveTo( time+64, pitch );
             path.setColor( color );
             path.draw();
         }
-        
-        
     }
     
     fbo->end();
