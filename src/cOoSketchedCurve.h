@@ -30,6 +30,10 @@ namespace cOo {
         float fboWidth;
         float fboHeight;
         ofFbo *fbo;
+        
+        enum RenderingMode {
+          DRAW_NORMAL, DRAW_BUBBLES, DRAW_DOT, DRAW_HAIRY
+        };
     };
 }
 

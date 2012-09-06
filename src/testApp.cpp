@@ -14,7 +14,7 @@ void testApp::setup( void ) {
         scaleChromatic[k] = 36.0f + (float)(k);
     }
     
-    timeline.loadVuzikFile( "icmc/draft2.xml" ); // import the Vuzik files
+    timeline.loadVuzikFile( "icmc/CD-I-completeDraft.xml" ); // import the Vuzik files
     //timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
     sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering

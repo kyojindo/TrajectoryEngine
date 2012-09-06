@@ -17,6 +17,19 @@ void cOo::SketchedCurve::generate( void ) {
     if ( (type == 0) || (type == 2) || (type == 5) ) {
         isChoirMob = true;
     }
+    int renderMode;
+    
+    bpf->getRecord(0, record);
+    
+    if (isChoirMob ) {
+        if (record.data.getVelocity() > 0.995) renderMode = DRAW_HAIRY;
+        else if (record.data.getVelocity() < 0.105) renderMode = DRAW_DOT;
+    }
+    else {
+        if (record.data.getVelocity() > 0.995) renderMode = DRAW_BUBBLES;
+        else if (record.data.getVelocity() < 0.105) renderMode = DRAW_HAIRY;
+    }
+        
     
     fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() )
     * screenMapper->getPixelPerSec() + 128.0f;
@@ -53,11 +66,11 @@ void cOo::SketchedCurve::generate( void ) {
             bpf->getRecord( k, record );
             
             //hairy cases
-            if ( (isChoirMob && (record.data.velocity > 0.995)) || (!isChoirMob && record.data.velocity < 0.105) ) {
+            if ( (isChoirMob && (record.data.velocity > 0.995)) || (!isChoirMob && record.data.velocity < 0.1025) ) {
                 radius = ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
                 
             }
-            else {
+            else {	
                 radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
             }
            

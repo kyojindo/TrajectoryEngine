@@ -279,7 +279,7 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
         bpfSize = vuzikLines[id].getSize();
         
         dataSet.velocity = vuzikLines[id].getLineWidth() / 10.0;
-        bool crazy = false; if( dataSet.velocity == 1.0 ) crazy = true;
+        bool crazy = false; if( dataSet.velocity > 0.9975 ) crazy = true;
         
         int lineType = VuzikXML::parseVuzikLineType( vuzikLines[id].red );
         (*t)->setProperties( id, lineType, crazy ); // set the BPF properties
