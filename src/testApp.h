@@ -15,6 +15,9 @@
 
 using namespace cOo;
 
+const int WHOLETONE = 5; const int CHROMATIC = 7;
+const int scaleTableSize = (int)VUZIK_PITCH_MAX;
+
 class testApp : public ofBaseApp {
     
   public:
@@ -71,8 +74,9 @@ class testApp : public ofBaseApp {
     ofxOscSender oscSender; // OSC sender
     ofxOscMessage message; // message
     
+    float scaleChromatic[scaleTableSize];
+    float scaleWholeTone[scaleTableSize];
+    
     bool showSplashScreen;
     ofImage splashScreen;
-    
-    int currentScale;
 };

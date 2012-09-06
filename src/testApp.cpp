@@ -5,7 +5,14 @@ void testApp::setup( void ) {
     list<SketchedCurve>::iterator skc;
     list<BreakPointFunction *>::iterator bpf;
     
-    ofSetFrameRate( 60 ); ofBackground( 10, 10, 10 );
+    ofSetFrameRate( 60 );
+    ofBackground( 10, 10, 10 );
+    
+    for( int k=0; k<scaleTableSize; k++ ) {
+    
+        scaleWholeTone[k] = 24.0f + (float)(2*k);
+        scaleChromatic[k] = 36.0f + (float)(k);
+    }
     
     timeline.loadVuzikFile( "icmc/draft2.xml" ); // import the Vuzik files
     //timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
@@ -15,15 +22,15 @@ void testApp::setup( void ) {
     for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
     bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
     
-    oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
+    //oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
+    oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
     oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
     
     zoomFactor = 1.0f; // set zoom factor to default
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     splashScreen.loadImage( "splash.png" );
-    showSplashScreen = true; // splash
-    currentScale = -1;
+    showSplashScreen = true; // splash scr
     
     fullScreen = false;
     playAsLoop = false;
@@ -68,13 +75,10 @@ void testApp::draw( void ) {
         
     } else {
         
-         // 33 slots on screen = we drawn 34 lines ---
-        int nOfSemitones = (int)( VUZIK_PITCH_MAX ) + 1;
-        
-        for( int k=0; k<nOfSemitones; k++ ) {
+        for( int k=0; k<((int)VUZIK_PITCH_MAX)+1; k++ ) {
         
             // [TODO] replace this by a screenMapper-based call and stuff
-            float semiLoc = ofMap( k, 0, nOfSemitones-1, 0, ofGetHeight() );
+            float semiLoc = ofMap( k, 0, VUZIK_PITCH_MAX, 0, ofGetHeight() );
             ofSetColor( 255, 255, 255, 30 ); ofSetLineWidth( 2 );
             ofLine( 0, semiLoc, ofGetWidth(), semiLoc );
         }
@@ -108,12 +112,11 @@ void testApp::draw( void ) {
             
             ofNoFill();
             ofColor tColor;
-            float tHue;
             
-            float yTouch = ofMap( dTouched[k].data.getPitch(), VUZIK_PITCH_MIN, VUZIK_PITCH_MAX, ofGetHeight(), 0 );
+            float yTouch = ofMap( dTouched[k].data.getPitch(),
+            VUZIK_PITCH_MIN, VUZIK_PITCH_MAX, ofGetHeight(), 0 );
             float xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
-                        
-            tHue = colorMap.get( dTouched[k].type );
+            float tHue = colorMap.get( dTouched[k].type );
             
             if( tHue >= 0.0f ) tColor.setHsb( tHue, 140, 180 ); else tColor.setHsb( 0, 0, 180 );
             ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 13 );
@@ -274,7 +277,11 @@ void testApp::sendTouchedAsOscMessages( void ) {
         message.addIntArg( tTouched[k].id );
         message.addIntArg( tTouched[k].type );
         
-        message.addFloatArg( tTouched[k].data.getPitch() );
+        float scaledPitch = 0.0f; int pIdx = (int) tTouched[k].data.getPitch();
+        if( tTouched[k].data.getScale() == WHOLETONE ) scaledPitch = scaleWholeTone[pIdx];
+        if( tTouched[k].data.getScale() == CHROMATIC ) scaledPitch = scaleChromatic[pIdx];
+        
+        message.addFloatArg( scaledPitch );
         message.addFloatArg( tTouched[k].data.getVelocity() );
         
         if( tTouched[k].craziness ) message.addIntArg( 1 );
@@ -283,17 +290,6 @@ void testApp::sendTouchedAsOscMessages( void ) {
         message.addIntArg( tTouched[k].state );
         
         oscSender.sendMessage( message );
-        if (tTouched[k].data.getScale() != currentScale) {
-            currentScale = tTouched[k].data.getScale();
-            message.clear();
-            message.setAddress( "/scale#" );
-            message.addIntArg(currentScale);
-            oscSender.sendMessage(message);
-            oscSender.sendMessage(message);
-            oscSender.sendMessage(message);
-            printf("changed scale to %i\n",currentScale);
-            
-        }
     }
 }
 
