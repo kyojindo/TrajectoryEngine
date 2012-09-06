@@ -19,6 +19,7 @@ void cOo::SketchedCurve::generate( void ) {
     }
     int renderMode;
     
+
     bpf->getRecord(0, record);
     
     if (isChoirMob ) {
@@ -44,6 +45,8 @@ void cOo::SketchedCurve::generate( void ) {
     glEnable( GL_LINE_SMOOTH ); glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+    
+    //if (renderMode== DRAW_NORMAL || renderMode == DRAW_HAIRY)
         
     for( int k=0; k<8; k++ ) {
     
@@ -66,7 +69,7 @@ void cOo::SketchedCurve::generate( void ) {
             bpf->getRecord( k, record );
             
             //hairy cases
-            if ( (isChoirMob && (record.data.velocity > 0.995)) || (!isChoirMob && record.data.velocity < 0.1025) ) {
+            if ( (isChoirMob && (record.data.velocity > 0.9975)) || (!isChoirMob && record.data.velocity < 0.1025) ) {
                 radius = ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
                 
             }
@@ -90,7 +93,7 @@ void cOo::SketchedCurve::generate( void ) {
             else path.curveTo( time+64, pitch );
             
             if (isChoirMob) {
-                if (record.data.velocity < 0.105){
+                if (record.data.velocity < 0.1025){
                     //choirmob: thin = dotted
                     drawOnce = true; //stop drawing more lines on future passes
                     if (1) {
@@ -105,7 +108,7 @@ void cOo::SketchedCurve::generate( void ) {
             }
             else { //MIXED PHASE
                 //Mixed phase: thick = bubbles
-                if (record.data.velocity > 0.995) {
+                if (record.data.velocity > 0.9975) {
                     drawOnce = true;
                     radius = ofMap( record.data.getVelocity(), 0, 1, 2.0, 5.0 ) + ofRandom( -2, 2 );
                     //set constant alpha for bubbles
