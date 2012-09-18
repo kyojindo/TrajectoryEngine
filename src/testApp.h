@@ -49,6 +49,8 @@ class testApp : public ofBaseApp {
     void windowResized( int w, int h );
     void gotMessage( ofMessage msg );
     
+    void loadScore(string fn, double timescale);
+    
   protected:
     
     static void playbackTimeInc( void *usrPtr ); // increment the pb head position

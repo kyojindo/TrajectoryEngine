@@ -36,7 +36,7 @@ namespace cOo {
         ~FunctionTimeline( void );
         
         void generate( Time maxTime );
-        void loadVuzikFile( string filename );
+        void loadVuzikFile( string filename, double timescale );
         void loadMidiFile( string filename );
         void clear( void );
         

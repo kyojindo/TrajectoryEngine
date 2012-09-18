@@ -1,5 +1,9 @@
 #include "testApp.h"
 
+double mvt1f = (5*60+38)/483.6; //5:38
+double mvt2f = (4*60+23)/156.88;//4:23
+double mvt3f = (3*60+2)/165.3;//3:02
+
 void testApp::setup( void ) {
     
     list<SketchedCurve>::iterator skc;
@@ -13,15 +17,16 @@ void testApp::setup( void ) {
         scaleWholeTone[k] = 24.0f + (float)(2*k);
         scaleChromatic[k] = 36.0f + (float)(k);
     }
+    loadScore("intertwine/1-Synchrome.xml", mvt1f);
     
-    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
-    timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
-    //timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
+//    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
+//    timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
+//    //timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
     timer.setup( 128, 0.01, &playbackTimeInc, this ); // register the callback
-    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
-    
-    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
-    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
+//    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
+//    
+//    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
+//    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
     
     oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
     //oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
@@ -35,6 +40,30 @@ void testApp::setup( void ) {
     
     fullScreen = false;
     playAsLoop = false;
+}
+
+void testApp::loadScore(string fn, double timescale) {
+    
+    stopPlayback();
+    timeline.clear();
+    
+    list<SketchedCurve>::iterator skc;
+    list<BreakPointFunction *>::iterator bpf;
+    timeline.loadVuzikFile( fn, timescale ); // import the Vuzik files
+    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
+    
+    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
+        bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
+    
+    zoomFactor = 1.5f; // set zoom factor to default
+    zoomTimeline( zoomFactor ); // and apply the zoom
+    
+    splashScreen.loadImage( "splash.png" );
+    showSplashScreen = false; // splash scr
+    
+    fullScreen = false;
+    playAsLoop = false;
+
 }
 
 void testApp::exit( void ) {
@@ -182,7 +211,7 @@ void testApp::moveTimeline( Time shift ) {
 }
 
 void testApp::startPlayback( void ) {
-
+    
     showSplashScreen = false;
     if( !timer.isRunning() ) timer.start();
 }
@@ -226,6 +255,10 @@ void testApp::keyPressed( int key ) {
     
     if( key == '<' ) moveTimeline( -0.1f );
     if( key == '>' ) moveTimeline( 0.1f );
+    
+    if( key == '1') loadScore("intertwine/1-Synchrome.xml", mvt1f);
+    if( key == '2') loadScore("intertwine/2-Controverse.xml", mvt2f);
+    if( key == '3') loadScore("intertwine/3-Intertwine.xml", mvt3f);
 }
 
 void testApp::keyReleased( int key ){

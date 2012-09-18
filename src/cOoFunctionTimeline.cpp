@@ -156,7 +156,13 @@ void cOo::FunctionTimeline::generate( Time maxTime ) {
 }
 
 // --- fill the timeline with a Vuzik XML score ---
-void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
+void cOo::FunctionTimeline::loadVuzikFile( string filename, double timescale) {
+    
+    startHead = stopHead = 0;
+    
+    scoreMaxTime = 0;
+    startList.clear();
+    stopList.clear();
     
     Time maxTime = 0.0;
     long bpfSize;
@@ -249,29 +255,31 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename ) {
             xmlFile.popTag(); // Graphics
             xmlFile.popTag(); // Graphics
             
-            printf( "x_min x_max: %f %f\n", x_min, x_max );
-            printf( "y_min y_max: %f %f\n", y_min, y_max );
+            //printf( "x_min x_max: %f %f\n", x_min, x_max );
+            //printf( "y_min y_max: %f %f\n", y_min, y_max );
             
             totalLines += numLines;
             
             x_offset += x_max; // increment begin time
-            printf( "x_offset pushed to %lf\n", x_offset );
+            //printf( "x_offset pushed to %lf\n", x_offset );
             
         }
         
         // NOTE: 1000pixels = 13.365 seconds -> 1000/13.365 = 74.8222
         x_in_max += x_max; // increment total time (combined offset)
-        maxTime += x_max/74.8222; // ----------------------------
+        maxTime += timescale*x_max/74.8222; // ----------------------------
     }
     
-    printf("total lines read = %li\n", totalLines);
+    //printf("total lines read = %li\n", totalLines);
     
     startList.resize( totalLines );
     stopList.resize( totalLines );
     scoreMaxTime = maxTime;
     
-    printf( "x_max = %lf\n", x_in_max );
-    printf( "x_min = %lf\n", x_in_min );
+    printf("score length = %lf\n",scoreMaxTime);
+    
+    //printf( "x_max = %lf\n", x_in_max );
+    //printf( "x_min = %lf\n", x_in_min );
     
     for( t=startList.begin(); t!=startList.end(); t++, id++ ) {
         
