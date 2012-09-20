@@ -44,7 +44,7 @@ void cOo::SketchedCurve::generate( void ) {
     ofClear( 255, 255, 255, 0 );
     glEnable( GL_LINE_SMOOTH ); glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+    glHint( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
     
     //if (renderMode== DRAW_NORMAL || renderMode == DRAW_HAIRY)
         
@@ -52,11 +52,11 @@ void cOo::SketchedCurve::generate( void ) {
     
         path.clear();
         path.setFilled( false );
-        path.setStrokeWidth( 1.5f );
+        path.setStrokeWidth( 2.1f );
         
         bool drawOnce = false;
         
-        float rAlpha = ofRandom( 50, 220 ); float rSat;
+        float rAlpha = ofRandom( 100, 220 ); float rSat;
         float rHue = colorMap.get( bpf->getType() );
         
         if( rHue < 0.0f ) rSat = 0.0f;

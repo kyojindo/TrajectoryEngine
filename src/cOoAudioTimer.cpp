@@ -1,5 +1,20 @@
 #include "cOoAudioTimer.h"
 
+void cOo::TimerThread::toClass( AudioTimer *at, int step ) {
+    
+    audioTimer = at;
+    stepInMs = step;
+}
+
+void cOo::TimerThread::threadedFunction( void ) {
+
+    while( isThreadRunning() ) {
+        
+        audioTimer->timeInc();
+        sleep( 10 );
+    }
+}
+
 cOo::AudioTimer::AudioTimer( void ) {
     
     audioCallbackTime = 0.0f;
@@ -8,38 +23,15 @@ cOo::AudioTimer::AudioTimer( void ) {
 }
 
 bool cOo::AudioTimer::setup( int audioBufferSize, double timeInterval, UserCallback callback, void *appPtr ) {
-
-    device = kAudioDeviceUnknown;
-    OSStatus err = kAudioHardwareNoError;
     
-    // set items of property address that never change
-    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
-    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
-    
-    propertyAddress.mSelector = kAudioHardwarePropertyDefaultOutputDevice;
-    ioDataSize = sizeof( AudioDeviceID ); // ask default output device
-    
-    err = AudioObjectGetPropertyData( kAudioObjectSystemObject, &propertyAddress, 0, NULL, &ioDataSize, &device );
-    if( err != kAudioHardwareNoError ) return false; // send the request to master kAudioObjectSystemObject
-    
-    propertyAddress.mSelector = kAudioDevicePropertyActualSampleRate;
-    ioDataSize = sizeof( Float64 ); // ask for the samplerate
-    
-    err = AudioObjectGetPropertyData( device, &propertyAddress, 0, NULL, &ioDataSize, &deviceSampleRate );
-    if( err != kAudioHardwareNoError ) return false; // send the request to our own audio output device
-    
-    propertyAddress.mSelector = kAudioDevicePropertyBufferSize; // ask to modify buffersize
-    ioDataSize = sizeof( UInt32 ); deviceBufferSize = (UInt32)audioBufferSize;
-    
-    err = AudioObjectSetPropertyData( device, &propertyAddress, 0, NULL, ioDataSize, &deviceBufferSize );
-    if( err != kAudioHardwareNoError ) return false; // send the request to our own audio output device
-    
-    err = AudioDeviceCreateIOProcID( device, ioProc, (void *)this, &deviceIOProcId );
-    if( err != kAudioHardwareNoError ) return false; // create the audio callback
+    deviceSampleRate = 44100.0f;
+    deviceBufferSize = audioBufferSize;
     
     userTimeInterval = timeInterval; // the time interval is set to user one
     userCallbackTime = timeInterval; // first time to catch = 0 + interval
     userCallback = callback; // we store the user callback
+    
+    timerThread.toClass( this, (int)(1000.0f*timeInterval) );
     userAppPtr = appPtr; // we store the user app pointer
     
     return true;
@@ -63,28 +55,23 @@ double cOo::AudioTimer::getTime( void ) {
 
 void cOo::AudioTimer::start( void ) {
 
-    AudioDeviceStart( device, deviceIOProcId );
+    timerThread.startThread();
     running = true;
 }
 
 void cOo::AudioTimer::stop( void ) {
 
-    AudioDeviceStop( device, deviceIOProcId );
+    timerThread.waitForThread();
     running = false;
 }
 
-OSStatus cOo::AudioTimer::ioProc( AudioDeviceID inDevice,
-const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-const AudioTimeStamp *inOutputTime, void* defptr ) {
-    
-    AudioTimer *timer = (AudioTimer *) defptr;
-    
-    if( timer->audioCallbackTime > timer->userCallbackTime ) {
+void cOo::AudioTimer::timeInc( void ) {
+
+    if( audioCallbackTime > userCallbackTime ) {
         
-        timer->userCallback( timer->userAppPtr ); // callback
-        timer->userCallbackTime += timer->userTimeInterval;
+        userCallback( userAppPtr ); // callback
+        userCallbackTime += userTimeInterval;
     }
-    timer->audioCallbackTime += ( (double)timer->deviceBufferSize / timer->deviceSampleRate ) / 8.0f;
-    return kAudioHardwareNoError; // we increment the time stamp each time audio is callbacked
+    
+    audioCallbackTime += ( (double)deviceBufferSize / deviceSampleRate );
 }
