@@ -17,8 +17,8 @@ void testApp::setup( void ) {
         scaleWholeTone[k] = 24.0f + (float)(2*k);
         scaleChromatic[k] = 36.0f + (float)(k);
     }
-    loadScore("icmc/combined.xml", 1.0);
-    //loadScore("intertwine/1-Synchrome.xml", mvt1f);
+    //loadScore("icmc/combined.xml", 1.0);
+    loadScore("intertwine/1-Synchrome.xml", mvt1f);
     
 
 //    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
