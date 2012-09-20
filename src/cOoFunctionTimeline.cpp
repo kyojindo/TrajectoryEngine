@@ -268,6 +268,8 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename, double timescale) {
         // NOTE: 1000pixels = 13.365 seconds -> 1000/13.365 = 74.8222
         x_in_max += x_max; // increment total time (combined offset)
         maxTime += timescale*x_max/74.8222; // ----------------------------
+        //maxTime += x_max/74.8222; // ----------------------------
+
     }
     
     //printf("total lines read = %li\n", totalLines);
@@ -309,7 +311,7 @@ void cOo::FunctionTimeline::loadVuzikFile( string filename, double timescale) {
     stopList = startList; // copy and sort stopList by stopTime order
     stopList.sort( cOo::BreakPointFunction::stopTimeSortPredicate );
     
-    scoreMaxTime += 20.0f; // add some room at the end
+    scoreMaxTime += 4.0f; // add some room at the end
     
 }
 

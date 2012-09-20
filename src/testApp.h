@@ -52,7 +52,7 @@ class testApp : public ofBaseApp {
     void loadScore(string fn, double timescale);
     
   protected:
-    
+
     static void playbackTimeInc( void *usrPtr ); // increment the pb head position
     void sendTouchedAsOscMessages( void ); // send OSC messages for touched sets
     void regenerateVisibleCurves( void ); // regenerate visible FBO curves

@@ -17,8 +17,10 @@ void testApp::setup( void ) {
         scaleWholeTone[k] = 24.0f + (float)(2*k);
         scaleChromatic[k] = 36.0f + (float)(k);
     }
-    loadScore("intertwine/1-Synchrome.xml", mvt1f);
+    loadScore("icmc/combined.xml", 1.0);
+    //loadScore("intertwine/1-Synchrome.xml", mvt1f);
     
+
 //    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
 //    timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
 //    //timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
@@ -26,13 +28,12 @@ void testApp::setup( void ) {
 //    sketchedCurve.resize( timeline.getSize() ); // resize the BPF-rendering
 //    
 //    for( bpf=timeline.getBegin(), skc=sketchedCurve.begin(); bpf!= timeline.getEnd();
-//    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO
+//    bpf++, skc++ ) (*skc).link( (*bpf), &screenMapper ); // link each BPF to its FBO    
+    //oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
+    oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
+    //oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
     
-    oscSender.setup( "127.0.0.1", 7000 ); // send OSC on port 7000
-    //oscSender.setup( "192.168.1.255", 7000 ); // send OSC on port 7000
-    oscReceiver.setup( 8000 ); // receive OSC on port 8000 (local)
-    
-    zoomFactor = 1.5f; // set zoom factor to default
+    zoomFactor = 1.0f; // set zoom factor to default
     zoomTimeline( zoomFactor ); // and apply the zoom
     
     splashScreen.loadImage( "splash.png" );
@@ -63,13 +64,15 @@ void testApp::loadScore(string fn, double timescale) {
     
     fullScreen = false;
     playAsLoop = false;
+    
+    movePlaybackTime(0.1);
 
 }
 
 void testApp::exit( void ) {
     
     // pause timer before quiting
-    if( isPlaying() ) pausePlayback();
+    if( isPlaying() ) { pausePlayback(); }
 }
 
 void testApp::update( void ) {
@@ -97,7 +100,7 @@ void testApp::draw( void ) {
     glEnable( GL_LINE_SMOOTH ); glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
-    if( showSplashScreen ) {
+    if( 0 ) {
         
         int x = ofGetWidth()/2 - splashScreen.width/2;
         int y = ofGetHeight()/2 - splashScreen.height/2;
@@ -213,17 +216,17 @@ void testApp::moveTimeline( Time shift ) {
 void testApp::startPlayback( void ) {
     
     showSplashScreen = false;
-    if( !timer.isRunning() ) timer.start();
+    if( !timer.isRunning() ) { timer.start(); }
 }
 
 void testApp::pausePlayback( void ) {
 
-    if( timer.isRunning() ) timer.stop();
+    if( timer.isRunning() ) { timer.stop(); }
 }
 
 void testApp::stopPlayback( void ) {
 
-    if( timer.isRunning() ) timer.stop();
+    if( timer.isRunning() ) { timer.stop(); }
     movePlaybackTime( 0.0f );
 }
 
@@ -337,7 +340,7 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         
         app->playbackAccess.unlock();
         
-        if( !app->playAsLoop ) app->timer.stop();
+        if( !app->playAsLoop ) { app->timer.stop(); }
         
         app->movePlaybackTime( 0.0f );
         app->screenMapper.setTimeOffset( 0.0f );

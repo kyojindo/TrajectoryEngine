@@ -1,12 +1,25 @@
 #ifndef __cOoAudioTimer__
 #define __cOoAudioTimer__
 
-#include <CoreAudio/AudioHardware.h>
+#include "ofMain.h"
 
 namespace cOo {
     
     typedef void (*UserCallback)( void *usrPtr );
     const int MinAudioBufferSize = 128;
+    
+    class AudioTimer;
+    
+    class TimerThread : public ofThread {
+    
+      public:
+        
+        void toClass( AudioTimer *at, int step );
+        void threadedFunction( void );
+        
+        AudioTimer *audioTimer;
+        int stepInMs;
+    };
     
     class AudioTimer {
     
@@ -22,13 +35,11 @@ namespace cOo {
         void start( void ); // start the timer
         void stop( void ); // stop the timer
         
+        void timeInc( void );
+        
       protected:
         
-        // the CoreAudio audio callback -------------
-        static OSStatus ioProc( AudioDeviceID inDevice,
-        const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-        const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-        const AudioTimeStamp *inOutputTime, void* defptr );
+        TimerThread timerThread; // thread that replace the audio timer
         
         double audioCallbackTime; // time stamp updated by audio callbacks
         double userTimeInterval; // time increment between user callbacks
@@ -36,14 +47,8 @@ namespace cOo {
         UserCallback userCallback; // user callback function
         void *userAppPtr; // user application pointer
         
-        AudioStreamBasicDescription deviceFormat;
-        AudioObjectPropertyAddress propertyAddress;
-        AudioDeviceIOProcID deviceIOProcId;
-        
-        Float64 deviceSampleRate;
-        UInt32 deviceBufferSize;
-        AudioDeviceID device;
-        UInt32 ioDataSize;
+        float deviceSampleRate;
+        int deviceBufferSize;
         
         bool running;
     };
