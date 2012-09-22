@@ -14,9 +14,9 @@ void cOo::SketchedCurve::generate( void ) {
     
     bool isChoirMob = false;
     int type = bpf->getType();
-    if ( (type == 0) || (type == 2) || (type == 5) ) {
+    //if ( (type == 0) || (type == 2) || (type == 5) ) {
         isChoirMob = true;
-    }
+    //}
     int renderMode;
     
 
