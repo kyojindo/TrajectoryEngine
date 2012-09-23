@@ -48,7 +48,7 @@ void cOo::SketchedCurve::generate( void ) {
     
     //if (renderMode== DRAW_NORMAL || renderMode == DRAW_HAIRY)
         
-    for( int k=0; k<8; k++ ) {
+    for( int j=0; j<8; j++ ) {
     
         path.clear();
         path.setFilled( false );
@@ -63,9 +63,13 @@ void cOo::SketchedCurve::generate( void ) {
         else rSat = ofRandom( 150, 220 );
         
         color.setHsb( rHue, rSat, 250, rAlpha );
+
+        long bpf_n = bpf->getSize();
+        if (bpf_n<4) path.setStrokeWidth(2.0);
         
         for( long k=0; k<bpf->getSize(); k++ ) {
             
+
             bpf->getRecord( k, record );
             
             //hairy cases
@@ -89,8 +93,15 @@ void cOo::SketchedCurve::generate( void ) {
             time = ( screenMapper->getXfromTime( record.data.time ) -
             screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
             
-            if( k==0 ) path.moveTo( time+64, pitch );
-            else path.curveTo( time+64, pitch );
+            if( k==0 ) {
+                path.moveTo( time+64, pitch );
+            }
+            else {
+                if (bpf_n>3)
+                    path.curveTo( time+64, pitch );
+                else
+                    path.lineTo( time+64, pitch );
+            }
             
             if (isChoirMob) {
                 if (record.data.velocity < 0.1025){
@@ -126,7 +137,10 @@ void cOo::SketchedCurve::generate( void ) {
         if (drawOnce) break;
         else {
             color.setHsb( colorMap.get( bpf->getType() ), rSat, 255, rAlpha );
-            path.curveTo( time+64, pitch );
+            if (bpf_n > 3)
+                path.curveTo( time+64, pitch );
+            else
+                path.lineTo( time+64, pitch );
             path.setColor( color );
             path.draw();
         }

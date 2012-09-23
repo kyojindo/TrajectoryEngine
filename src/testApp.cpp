@@ -19,6 +19,8 @@ void testApp::setup( void ) {
     }
     
     //loadScore("icmc/combined.xml", 1.0);
+    //loadScore( "intertwine/smallPoints.xml", mvt1f );
+    
     loadScore( "intertwine/1-Synchrome.xml", mvt1f );
     
 //    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
@@ -66,6 +68,7 @@ void testApp::loadScore(string fn, double timescale) {
     playAsLoop = false;
     
     movePlaybackTime(0.1);
+    screenMapper.setTimeOffset( 0.0f );
 
 }
 
@@ -143,22 +146,25 @@ void testApp::draw( void ) {
         // draw circles for touched data sets
         for( long k=0; k<dTouched.size(); k++ ) {
             
-            ofNoFill();
-            ofColor tColor;
-            
-            float yTouch = ofMap( dTouched[k].data.getPitch(),
-            VUZIK_PITCH_MIN, VUZIK_PITCH_MAX, ofGetHeight(), 0 );
-            float xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
-            float tHue = colorMap.get( dTouched[k].type );
-            
-            if( tHue >= 0.0f ) tColor.setHsb( tHue, 140, 180 ); else tColor.setHsb( 0, 0, 180 );
-            ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 13 );
-            
-            if( tHue >= 0.0f ) tColor.setHsb( tHue, 220, 220 ); else tColor.setHsb( 0, 0, 220 );
-            ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 14 );
-            
-            if( tHue >= 0.0f ) tColor.setHsb( tHue, 180, 150 ); else tColor.setHsb( 0, 0, 150 );
-            ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 15 );
+            if (dTouched[k].data.getVelocity() >0.105) {
+                
+                ofNoFill();
+                ofColor tColor;
+                
+                float yTouch = ofMap( dTouched[k].data.getPitch(),
+                VUZIK_PITCH_MIN, VUZIK_PITCH_MAX, ofGetHeight(), 0 );
+                float xTouch = screenMapper.getXfromTime( dTouched[k].data.time );
+                float tHue = colorMap.get( dTouched[k].type );
+                
+                if( tHue >= 0.0f ) tColor.setHsb( tHue, 140, 180 ); else tColor.setHsb( 0, 0, 180 );
+                ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 13 );
+                
+                if( tHue >= 0.0f ) tColor.setHsb( tHue, 220, 220 ); else tColor.setHsb( 0, 0, 220 );
+                ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 14 );
+                
+                if( tHue >= 0.0f ) tColor.setHsb( tHue, 180, 150 ); else tColor.setHsb( 0, 0, 150 );
+                ofSetColor( tColor, 200 ); ofCircle( xTouch, yTouch, 15 );
+            }
         }
         
         playbackAccess.lock();
@@ -259,9 +265,22 @@ void testApp::keyPressed( int key ) {
     if( key == '<' ) moveTimeline( -0.1f );
     if( key == '>' ) moveTimeline( 0.1f );
     
-    if( key == '1') loadScore("intertwine/1-Synchrome.xml", mvt1f);
-    if( key == '2') loadScore("intertwine/2-Controverse.xml", mvt2f);
-    if( key == '3') loadScore("intertwine/3-Intertwine.xml", mvt3f);
+    if( key == '1') {
+        loadScore("intertwine/1-Synchrome.xml", mvt1f);
+        zoomFactor = 0.75;
+        zoomTimeline(zoomFactor);
+    }
+    if( key == '2') {
+        loadScore("intertwine/2-Controverse.xml", mvt2f);
+        zoomFactor = 0.75;
+        zoomTimeline(zoomFactor);
+    }
+    if( key == '3') {
+        loadScore("intertwine/3-Intertwine.xml", mvt3f);
+        zoomFactor = 1.0;
+        zoomTimeline(zoomFactor);
+
+    }
 }
 
 void testApp::keyReleased( int key ){
