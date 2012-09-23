@@ -1,6 +1,6 @@
 #include "testApp.h"
 
-double mvt1f = (5*60+38)/483.6; //5:38
+double mvt1f = 0.825*(5*60+38)/483.6; //5:38
 double mvt2f = (4*60+23)/156.88;//4:23
 double mvt3f = (3*60+2)/165.3;//3:02
 
@@ -17,10 +17,10 @@ void testApp::setup( void ) {
         scaleWholeTone[k] = 24.0f + (float)(2*k);
         scaleChromatic[k] = 36.0f + (float)(k);
     }
-    //loadScore("icmc/combined.xml", 1.0);
-    loadScore("intertwine/1-Synchrome.xml", mvt1f);
     
-
+    //loadScore("icmc/combined.xml", 1.0);
+    loadScore( "intertwine/1-Synchrome.xml", mvt1f );
+    
 //    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
 //    timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
 //    //timeline.loadVuzikFile( "calibration.xml" ); // import the Vuzik files
