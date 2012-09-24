@@ -97,11 +97,14 @@ void cOo::SketchedCurve::generate( void ) {
                 path.moveTo( time+64, pitch );
             }
             else {
-                if (bpf_n>3)
-                    path.curveTo( time+64, pitch );
-                else
-                    path.lineTo( time+64, pitch );
+                if (bpf_n<4) { //make curves at least 4 pts
+                    for (int i=0; i<4-bpf_n; i++) {
+                        path.curveTo( time+64-0.05+i*0.02, pitch + ofRandom(-radius, radius));
+                    }
+                }
+                path.curveTo( time+64, pitch );
             }
+
             
             if (isChoirMob) {
                 if (record.data.velocity < 0.1025){
@@ -137,10 +140,7 @@ void cOo::SketchedCurve::generate( void ) {
         if (drawOnce) break;
         else {
             color.setHsb( colorMap.get( bpf->getType() ), rSat, 255, rAlpha );
-            if (bpf_n > 3)
-                path.curveTo( time+64, pitch );
-            else
-                path.lineTo( time+64, pitch );
+            path.curveTo( time+64, pitch );
             path.setColor( color );
             path.draw();
         }
