@@ -345,7 +345,8 @@ void testApp::sendTouchedAsOscMessages( void ) {
         
         message.addIntArg( tTouched[k].state );
         
-        oscSender.sendMessage( message );
+        if (tTouched[k].data.getVelocity() > 0.1025)
+            oscSender.sendMessage( message );
     }
 }
 
