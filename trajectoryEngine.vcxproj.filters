@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\testApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscSender.cpp">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.cpp">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscReceiver.cpp">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscMessage.cpp">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32\NetworkingUtilsWin.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32\UdpSocketWin.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix\UdpSocket.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix\NetworkingUtils.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\IpEndpointName.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscOutboundPacketStream.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoBreakPointFunction.cpp">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoDataSet.cpp">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoFunctionTimeline.cpp">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoAudioTimer.cpp">
+      <Filter>src\AudioTimer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoColorMap.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoScreenMapper.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoSketchedCurve.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoMIDITextTrack.cpp">
+      <Filter>src\Import</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoVuzikXML.cpp">
+      <Filter>src\Import</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp">
+      <Filter>addons\ofxXmlSettings\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp">
+      <Filter>addons\ofxXmlSettings\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp">
+      <Filter>addons\ofxXmlSettings\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp">
+      <Filter>addons\ofxXmlSettings\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{71834f65-f3a9-211e-73b8-dc8563776aec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc">
+      <UniqueIdentifier>{d91dca33-6e5d-4481-2aec-9fbb1b7355db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\src">
+      <UniqueIdentifier>{b9dd339a-d93d-92a1-0a2f-4b41d690f257}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs">
+      <UniqueIdentifier>{99eca1d9-873f-4622-8fc0-fc7b46b76347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs\oscpack">
+      <UniqueIdentifier>{d3a98534-1602-4fef-57a6-659374ee9b23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs\oscpack\src">
+      <UniqueIdentifier>{bfb5bb47-98c8-bbcb-3066-1046a8b06581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs\oscpack\src\ip">
+      <UniqueIdentifier>{5a029128-eb41-95c5-cbc0-cded454d99e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs\oscpack\src\ip\win32">
+      <UniqueIdentifier>{79dfdfe2-400b-8654-3675-01a3f46a2e7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs\oscpack\src\ip\posix">
+      <UniqueIdentifier>{354c95cf-a234-0360-c6bc-af410d70c032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxOsc\libs\oscpack\src\osc">
+      <UniqueIdentifier>{edacb89c-9768-9551-4d41-b59015925509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\FunctionTimeline">
+      <UniqueIdentifier>{27853feb-cbd6-4250-b031-b7c7c945caa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\AudioTimer">
+      <UniqueIdentifier>{156c7355-ed78-47ee-8ca0-78c1b3904909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering">
+      <UniqueIdentifier>{a774f766-f15d-43c7-91bc-098de30a0d47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Import">
+      <UniqueIdentifier>{4a54c4c9-c98e-4adf-8849-1c7a5a836609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxXmlSettings">
+      <UniqueIdentifier>{ce93b215-0e82-48d9-96b7-d1861492983a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxXmlSettings\libs">
+      <UniqueIdentifier>{bc5f575d-cef3-4617-858d-f28a9ec50a12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxXmlSettings\src">
+      <UniqueIdentifier>{f8467e84-84a8-45a7-a345-2e8825908999}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\testApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscSender.h">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscMessage.h">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.h">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscReceiver.h">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOsc.h">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscArg.h">
+      <Filter>addons\ofxOsc\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\NetworkingUtils.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\TimerListener.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\UdpSocket.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\IpEndpointName.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\ip\PacketListener.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscException.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPacketListener.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscOutboundPacketStream.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\MessageMappingOscPacketListener.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscHostEndianness.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.h">
+      <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoBreakPointFunction.h">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoDataSet.h">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoFunctionTimeline.h">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoRecord.h">
+      <Filter>src\FunctionTimeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoAudioTimer.h">
+      <Filter>src\AudioTimer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoColorMap.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoScreenMapper.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoSketchedCurve.h">
+      <Filter>src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoMIDITextTrack.h">
+      <Filter>src\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\Aura\Downloads\kyojindo-TrajectoryEngine-644868a\kyojindo-TrajectoryEngine-644868a\src\cOoVuzikXML.h">
+      <Filter>src\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h">
+      <Filter>addons\ofxXmlSettings\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h">
+      <Filter>addons\ofxXmlSettings\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
