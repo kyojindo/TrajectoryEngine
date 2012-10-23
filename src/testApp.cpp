@@ -130,7 +130,10 @@ void testApp::draw( void ) {
         }
         
         // memory-protected exchange of data
-        OSMemoryBarrier(); dTouched = sTouched;
+#ifndef WIN32
+        OSMemoryBarrier(); 
+#endif
+		dTouched = sTouched;
         
         playbackAccess.lock(); // playback time is locked
         float tVal = screenMapper.getXfromTime( playbackTime );
@@ -186,7 +189,10 @@ void testApp::draw( void ) {
 
 void testApp::movePlaybackTime( Time time ) {
     
-    OSMemoryBarrier(); uTouched = tTouched;
+#ifdef OF_TARGET_OSX
+        OSMemoryBarrier(); 
+#endif
+	uTouched = tTouched;
     
     timer.moveOffset( time ); // we move timer at new time
     
@@ -197,9 +203,16 @@ void testApp::movePlaybackTime( Time time ) {
     timeline.getTouched( uTouched, time ); // here we get the touched directly
     sendTouchedAsOscMessages(); // then we send OSC messages to report that change
     timeline.cleanEndTouched( uTouched ); // and we clean 'atEnd' ones right away
-    
-    OSMemoryBarrier(); tTouched = uTouched;    
-    OSMemoryBarrier(); sTouched = tTouched;
+#ifdef OF_TARGET_OSX
+        OSMemoryBarrier(); 
+#endif
+	tTouched = uTouched;    
+
+#ifndef WIN32
+        OSMemoryBarrier(); 
+#endif
+
+	sTouched = tTouched;
 }
 
 void testApp::zoomTimeline( double factor ) {
@@ -212,6 +225,7 @@ void testApp::zoomTimeline( double factor ) {
     screenMapper.incTimeOffset( newPbt-playbackTime );
     
     regenerateVisibleCurves();
+
 }
 
 void testApp::moveTimeline( Time shift ) {
@@ -285,7 +299,7 @@ void testApp::keyPressed( int key ) {
 
 void testApp::keyReleased( int key ){
     
-    if( key == 'f' ) { usleep( 5000 ); regenerateVisibleCurves(); }
+	if( key == 'f' ) { ofSleepMillis( 5 ); regenerateVisibleCurves(); }
 }
 
 void testApp::mousePressed( int x, int y, int button ) {
@@ -373,7 +387,10 @@ void testApp::playbackTimeInc( void *usrPtr ) {
         app->timeline.getNextTouched( app->tTouched, app->playbackTime );
         app->playbackAccess.unlock();
         
-        OSMemoryBarrier(); app->sTouched = app->tTouched;
+#ifdef OF_TARGET_OSX
+        OSMemoryBarrier(); 
+#endif
+		app->sTouched = app->tTouched;
         
         app->sendTouchedAsOscMessages();
     }
