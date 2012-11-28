@@ -1,7 +1,7 @@
 #include "cOoSketchedCurve.h"
 
 void cOo::SketchedCurve::link( BreakPointFunction *function, ScreenMapper *smap ) {
-
+    
     visible = false; fbo = NULL;
     bpf = function; screenMapper = smap;
     ofSetLogLevel( OF_LOG_ERROR );
@@ -14,12 +14,12 @@ void cOo::SketchedCurve::generate( void ) {
     
     bool isChoirMob = false;
     int type = bpf->getType();
-    //if ( (type == 0) || (type == 2) || (type == 5) ) {
+    if ( (type == 0) || (type == 2) || (type == 5) ) {
         isChoirMob = true;
-    //}
+    }
     int renderMode;
     
-
+    
     bpf->getRecord(0, record);
     
     if (isChoirMob ) {
@@ -30,7 +30,7 @@ void cOo::SketchedCurve::generate( void ) {
         if (record.data.getVelocity() > 0.995) renderMode = DRAW_BUBBLES;
         else if (record.data.getVelocity() < 0.105) renderMode = DRAW_HAIRY;
     }
-        
+    
     
     fboWidth = ( bpf->getMaxTime()-bpf->getMinTime() )
     * screenMapper->getPixelPerSec() + 128.0f;
@@ -47,9 +47,9 @@ void cOo::SketchedCurve::generate( void ) {
     glHint( GL_LINE_SMOOTH_HINT, GL_DONT_CARE );
     
     //if (renderMode== DRAW_NORMAL || renderMode == DRAW_HAIRY)
-        
-    for( int j=0; j<8; j++ ) {
     
+    for( int j=0; j<8; j++ ) {
+        
         path.clear();
         path.setFilled( false );
         path.setStrokeWidth( 2.1f );
@@ -63,13 +63,13 @@ void cOo::SketchedCurve::generate( void ) {
         else rSat = ofRandom( 150, 220 );
         
         color.setHsb( rHue, rSat, 250, rAlpha );
-
+        
         long bpf_n = bpf->getSize();
         if (bpf_n<4) path.setStrokeWidth(2.0);
         
         for( long k=0; k<bpf->getSize(); k++ ) {
             
-
+            
             bpf->getRecord( k, record );
             
             //hairy cases
@@ -77,10 +77,10 @@ void cOo::SketchedCurve::generate( void ) {
                 radius = ofMap( record.data.getVelocity(), 0, 1, 0.1, 10 ) + ofRandom( -60, 60 );
                 
             }
-            else {	
+            else {
                 radius = ofMap( record.data.getVelocity(), 0, 1, 0.2, 8 ) + ofRandom( -4, 4 );
             }
-           
+            
             if( k == 0 ) {
                 radius = 0.1;
             }
@@ -88,10 +88,10 @@ void cOo::SketchedCurve::generate( void ) {
             if( k == bpf->getSize()-1 ) radius = 0.1;
             
             pitch = ofMap( record.data.getPitch(), VUZIK_PITCH_MIN,
-            VUZIK_PITCH_MAX, ofGetHeight(), 0 ) + ofRandom( -radius, radius );
+                          VUZIK_PITCH_MAX, ofGetHeight(), 0 ) + ofRandom( -radius, radius );
             
             time = ( screenMapper->getXfromTime( record.data.time ) -
-            screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
+                    screenMapper->getXfromTime( bpf->getMinTime() ) ) + ofRandom( -radius, radius );
             
             if( k==0 ) {
                 path.moveTo( time+64, pitch );
@@ -104,7 +104,7 @@ void cOo::SketchedCurve::generate( void ) {
                 }
                 path.curveTo( time+64, pitch );
             }
-
+            
             
             if (isChoirMob) {
                 if (record.data.velocity < 0.1025){
@@ -160,7 +160,7 @@ void cOo::SketchedCurve::draw( void ) {
     float xMax = screenMapper->getXfromTime( bpf->getMaxTime() );
     
     if( xMin > ofGetWidth() || xMax < 0 ) {
-    
+        
         if( fbo != NULL ) { delete fbo; fbo = NULL; }
         visible = false; // out of the window
         
@@ -175,6 +175,6 @@ void cOo::SketchedCurve::draw( void ) {
 }
 
 bool cOo::SketchedCurve::isVisible( void ) {
-
+    
     return( visible );
 }
