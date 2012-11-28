@@ -18,10 +18,11 @@ void testApp::setup( void ) {
         scaleChromatic[k] = 36.0f + (float)(k);
     }
     
-    //loadScore("icmc/combined.xml", 1.0);
+    loadScore("icmc/combined.xml", 1.0);
+    //loadScore("icmc/lineTypes.xml", 1.0);
     //loadScore( "intertwine/smallPoints.xml", mvt1f );
     
-    loadScore( "intertwine/1-Synchrome.xml", mvt1f );
+    //loadScore( "intertwine/1-Synchrome.xml", mvt1f );
     
 //    //timeline.loadVuzikFile( "icmc/lineTypes.xml" ); // import the Vuzik
 //    timeline.loadVuzikFile( "icmc/combined.xml" ); // import the Vuzik files
